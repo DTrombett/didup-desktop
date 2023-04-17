@@ -1,19 +1,37 @@
 {
-  "compilerOptions": {
-    "incremental": true,
-    "target": "es2021",
-    "module": "commonjs",
-    "lib": ["dom", "es2021"],
-    "jsx": "react-jsx",
-    "strict": true,
-    "sourceMap": true,
-    "baseUrl": "./src",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "outDir": ".erb/dll"
-  },
-  "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
+	// "extends": "@tsconfig/create-react-app/tsconfig.json",
+	"compilerOptions": {
+		"incremental": true,
+		"target": "es2021",
+		"module": "commonjs",
+		"lib": [
+			"dom",
+			"es2021"
+		],
+		"jsx": "react-jsx",
+		"strict": true,
+		"sourceMap": true,
+		"baseUrl": "./src",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
+		"allowJs": true,
+		"outDir": ".erb/dll",
+		"alwaysStrict": true,
+		"importHelpers": true,
+		"newLine": "lf",
+		"skipLibCheck": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitOverride": true,
+		"noImplicitThis": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+	},
+	"exclude": [
+		"test",
+		"release/build",
+		"release/app/dist",
+		".erb/dll"
+	]
 }

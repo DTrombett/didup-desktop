@@ -1,16 +1,17 @@
-import chalk from 'chalk';
+import chalk from "chalk";
+import { env, exit } from "node:process";
 
 export default function checkNodeEnv(expectedEnv) {
-  if (!expectedEnv) {
-    throw new Error('"expectedEnv" not set');
-  }
+	// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+	if (!expectedEnv) throw new Error('"expectedEnv" not set');
 
-  if (process.env.NODE_ENV !== expectedEnv) {
-    console.log(
-      chalk.whiteBright.bgRed.bold(
-        `"process.env.NODE_ENV" must be "${expectedEnv}" to use this webpack config`
-      )
-    );
-    process.exit(2);
-  }
+	if (env.NODE_ENV !== expectedEnv) {
+		console.log(
+			chalk.whiteBright.bgRed.bold(
+				// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+				`"process.env.NODE_ENV" must be "${expectedEnv}" to use this webpack config`
+			)
+		);
+		exit(2);
+	}
 }
