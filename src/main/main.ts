@@ -1,52 +1,33 @@
-/**
- * This module executes inside of electron's main process. You can start
- * electron renderer process from here and communicate with the other processes
- * through IPC.
- *
- * When running `npm run build` or `npm run build:main`, this file is compiled to
- * `./src/main.js` using webpack. This gives us some performance wins.
- */
-import { BrowserWindow, app, ipcMain, shell } from "electron";
-import { join } from "node:path";
-import { env, platform, resourcesPath } from "node:process";
-import MenuBuilder from "./menu";
-import { resolveHtmlPath } from "./util";
+import { BrowserWindow, app, shell } from "electron";
+import { join, resolve } from "node:path";
+import {
+	argv,
+	defaultApp,
+	env,
+	execPath,
+	exit,
+	resourcesPath,
+} from "node:process";
+import { URL } from "node:url";
+import { Client, generateLoginLink, getToken } from "../../../portaleargo-api";
+import installExtensions from "./utils/installExtensions";
+import MenuBuilder from "./utils/menu";
+import resolveHtmlPath from "./utils/resolveHtmlPath";
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on("ipc-example", async (event, arg) => {
-	const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-	console.log(msgTemplate(arg));
-	event.reply("ipc-example", msgTemplate("pong"));
-});
-if (env.NODE_ENV === "production")
-	(
-		require("source-map-support") as {
-			install(): void;
-		}
-	).install();
+let win: BrowserWindow | null = null;
+let urlData: ReturnType<typeof generateLoginLink>;
+const protocol = "it.argosoft.didup.famiglia.new";
 const isDebug = env.NODE_ENV === "development" || env.DEBUG_PROD === "true";
-
-if (isDebug) (require("electron-debug") as () => void)();
-const installExtensions = async () => {
-	const installer: Record<string, string> & {
-		default: (extensions: string[], forceDownload: boolean) => Promise<void>;
-	} = require("electron-devtools-installer");
-
-	return installer
-		.default(
-			["REACT_DEVELOPER_TOOLS"].map((name) => installer[name]),
-			!!env.UPGRADE_EXTENSIONS!
-		)
-		.catch(console.log);
-};
+const gotTheLock = app.requestSingleInstanceLock();
+const client = new Client({
+	debug: true,
+});
 const createWindow = async () => {
 	if (isDebug) await installExtensions();
-	mainWindow = new BrowserWindow({
+	win = new BrowserWindow({
 		show: false,
-		width: 1024,
-		height: 728,
+		autoHideMenuBar: true,
+		opacity: 0.8,
 		icon: join(
 			app.isPackaged
 				? join(resourcesPath, "assets")
@@ -59,40 +40,75 @@ const createWindow = async () => {
 				: join(__dirname, "../../.erb/dll/preload.js"),
 		},
 	});
-	mainWindow.loadURL(resolveHtmlPath("index.html")).catch(console.error);
-	mainWindow.on("ready-to-show", () => {
-		if (!mainWindow) throw new Error('"mainWindow" is not defined');
-
-		if (env.START_MINIMIZED!) mainWindow.minimize();
-		else mainWindow.show();
+	win.maximize();
+	win.loadURL(resolveHtmlPath("index.html")).catch(console.error);
+	win.on("ready-to-show", () => {
+		if (!win) throw new Error('"mainWindow" is not defined');
+		win.show();
 	});
-	mainWindow.on("closed", () => {
-		mainWindow = null;
+	win.on("closed", () => {
+		win = null;
 	});
-	new MenuBuilder(mainWindow).buildMenu();
-	// Open urls in the user's browser
-	mainWindow.webContents.setWindowOpenHandler((edata) => {
+	win.webContents.setWindowOpenHandler((edata) => {
 		shell.openExternal(edata.url).catch(console.error);
 		return { action: "deny" };
 	});
+	new MenuBuilder(win).buildMenu();
+	await client.loadData();
+	urlData = generateLoginLink();
+	if (!client.token) win.loadURL(urlData.url).catch(console.error);
 };
-/**
- * Add event listeners...
- */
 
+if (!gotTheLock) {
+	app.quit();
+	exit();
+}
 app.on("window-all-closed", () => {
-	// Respect the OSX convention of having the application in memory even
+	// _Do not_ respect the OSX convention of having the application in memory even
 	// after all windows have been closed
-	if (platform !== "darwin") app.quit();
+	app.quit();
 });
-app
-	.whenReady()
-	.then(() => {
-		app.on("activate", () => {
-			// On macOS it's common to re-create a window in the app when the
-			// dock icon is clicked and there are no other windows open.
-			if (mainWindow === null) void createWindow();
-		});
-		return createWindow();
-	})
-	.catch(console.error);
+app.on("second-instance", async (_, commandLine) => {
+	if (!win) return;
+	if (win.isMinimized()) win.restore();
+	if (!win.isFocused()) win.focus();
+	const url = new URL(commandLine.at(-1)!);
+
+	if (url.hostname === "login-callback") {
+		const code = url.searchParams.get("code");
+
+		if (code == null) console.error("Code not found", code);
+		else {
+			await getToken(client, {
+				codeVerifier: urlData.codeVerifier,
+				code,
+			}).catch(console.error);
+			console.log(client.token);
+			win.loadURL(resolveHtmlPath("index.html")).catch(console.error);
+		}
+	} else
+		win
+			.loadURL(resolveHtmlPath(url.href.slice(url.protocol.length + 2)))
+			.catch(console.error);
+});
+if (env.NODE_ENV === "production")
+	(
+		require("source-map-support") as {
+			install(): void;
+		}
+	).install();
+if (isDebug) (require("electron-debug") as () => void)();
+if (defaultApp) {
+	if (argv.length >= 2)
+		app.setAsDefaultProtocolClient(protocol, execPath, [
+			"-r",
+			join(
+				__dirname,
+				"../..",
+				"node_modules",
+				"ts-node/register/transpile-only"
+			),
+			resolve("."),
+		]);
+} else app.setAsDefaultProtocolClient(protocol);
+app.whenReady().then(createWindow).catch(console.error);

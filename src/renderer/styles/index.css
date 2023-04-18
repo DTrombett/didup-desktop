@@ -1,0 +1,22 @@
+body {
+	position: relative;
+	color: #dbdee1;
+	height: 100vh;
+	background: #313338;
+	font-family: sans-serif;
+	overflow-y: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	user-select: none;
+}
+
+.title {
+	color: #dbdee1;
+}
+
+.Home {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+}

@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { env, exit } from "node:process";
 
-export default function checkNodeEnv(expectedEnv) {
+export default (expectedEnv) => {
 	// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
 	if (!expectedEnv) throw new Error('"expectedEnv" not set');
 
@@ -14,4 +14,4 @@ export default function checkNodeEnv(expectedEnv) {
 		);
 		exit(2);
 	}
-}
+};

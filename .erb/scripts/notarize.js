@@ -2,7 +2,7 @@ const { notarize } = require("@electron/notarize");
 const { env } = require("node:process");
 const { build } = require("../../package.json");
 
-exports.default = async function notarizeMacos(context) {
+exports.default = async (context) => {
 	const { electronPlatformName, appOutDir } = context;
 	if (electronPlatformName !== "darwin") return;
 
