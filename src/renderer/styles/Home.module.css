@@ -1,0 +1,27 @@
+@font-face {
+	font-family: Poppins;
+	src: url("../../../assets/Poppins-SemiBold.ttf");
+}
+
+.icon {
+	margin-bottom: 2rem;
+	width: 15rem;
+}
+
+.title {
+	margin-bottom: 0.3rem !important;
+	text-transform: uppercase;
+	text-align: center;
+	font-family: Poppins;
+}
+
+.version {
+	margin-bottom: 2rem;
+	text-align: center;
+	vertical-align: middle;
+	font-family: Poppins;
+}
+
+.loading {
+	width: 2rem;
+}

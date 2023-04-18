@@ -3,7 +3,7 @@ import path from "node:path";
 import rimraf from "rimraf";
 import webpackPaths from "../configs/webpack.paths";
 
-export default function deleteSourceMaps() {
+export default () => {
 	if (fs.existsSync(webpackPaths.distMainPath))
 		rimraf.sync(path.join(webpackPaths.distMainPath, "*.js.map"));
 	if (fs.existsSync(webpackPaths.distRendererPath))
