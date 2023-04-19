@@ -1,31 +1,38 @@
-import type { IpcRendererEvent } from "electron";
 import { contextBridge, ipcRenderer } from "electron";
+import type { Profilo } from "portaleargo-api";
 
-type OnCallback = Parameters<Electron.IpcRenderer["on"]>[1];
-export type Args = {
-	ping: [message: string];
+type CallbackArgs<A = [], B = []> = [A, B];
+type Args = {
+	ping: CallbackArgs<[message: string], [message: string]>;
+	login: CallbackArgs;
+};
+type Invoke = {
+	getProfiles: CallbackArgs<[], Profilo[]>;
 };
 
 const electronHandler = {
 	ipcRenderer: {
-		sendMessage<T extends keyof Args>(channel: T, ...args: Args[T]) {
+		send<T extends keyof Args>(channel: T, ...args: Args[T][0]) {
 			ipcRenderer.send(channel, ...args);
 		},
-		on<T extends keyof Args>(channel: T, func: (...args: Args[T]) => void) {
-			const subscription = (_event: IpcRendererEvent, ...args: Args[T]) => {
+		on<T extends keyof Args>(channel: T, func: (...args: Args[T][1]) => void) {
+			ipcRenderer.on(channel, (_event, ...args: any) => {
 				func(...args);
-			};
-
-			ipcRenderer.on(channel, subscription as OnCallback);
-
-			return () => {
-				ipcRenderer.removeListener(channel, subscription as OnCallback);
-			};
+			});
 		},
-		once<T extends keyof Args>(channel: T, func: (...args: Args[T]) => void) {
-			ipcRenderer.once(channel, ((_event, ...args: Args[T]) => {
+		once<T extends keyof Args>(
+			channel: T,
+			func: (...args: Args[T][1]) => void
+		) {
+			ipcRenderer.once(channel, (_event, ...args: any) => {
 				func(...args);
-			}) as OnCallback);
+			});
+		},
+		removeAllListeners<T extends keyof Args>(channel: T) {
+			ipcRenderer.removeAllListeners(channel);
+		},
+		invoke<T extends keyof Invoke>(channel: T, ...args: Invoke[T][0]) {
+			return ipcRenderer.invoke(channel, ...args) as Promise<Invoke[T][1]>;
 		},
 	},
 };

@@ -1,14 +1,88 @@
-body {
+@font-face {
+	font-family: "Poppins Black";
+	src: url("../../../assets/fonts/Poppins-Black.ttf");
+}
+@font-face {
+	font-family: "Poppins BlackItalic";
+	src: url("../../../assets/fonts/Poppins-BlackItalic.ttf");
+}
+@font-face {
+	font-family: "Poppins Bold";
+	src: url("../../../assets/fonts/Poppins-Bold.ttf");
+}
+@font-face {
+	font-family: "Poppins BoldItalic";
+	src: url("../../../assets/fonts/Poppins-BoldItalic.ttf");
+}
+@font-face {
+	font-family: "Poppins ExtraBold";
+	src: url("../../../assets/fonts/Poppins-ExtraBold.ttf");
+}
+@font-face {
+	font-family: "Poppins ExtraBoldItalic";
+	src: url("../../../assets/fonts/Poppins-ExtraBoldItalic.ttf");
+}
+@font-face {
+	font-family: "Poppins ExtraLight";
+	src: url("../../../assets/fonts/Poppins-ExtraLight.ttf");
+}
+@font-face {
+	font-family: "Poppins ExtraLightItalic";
+	src: url("../../../assets/fonts/Poppins-ExtraLightItalic.ttf");
+}
+@font-face {
+	font-family: "Poppins Italic";
+	src: url("../../../assets/fonts/Poppins-Italic.ttf");
+}
+@font-face {
+	font-family: "Poppins Light";
+	src: url("../../../assets/fonts/Poppins-Light.ttf");
+}
+@font-face {
+	font-family: "Poppins LightItalic";
+	src: url("../../../assets/fonts/Poppins-LightItalic.ttf");
+}
+@font-face {
+	font-family: "Poppins Medium";
+	src: url("../../../assets/fonts/Poppins-Medium.ttf");
+}
+@font-face {
+	font-family: "Poppins MediumItalic";
+	src: url("../../../assets/fonts/Poppins-MediumItalic.ttf");
+}
+@font-face {
+	font-family: "Poppins Regular";
+	src: url("../../../assets/fonts/Poppins-Regular.ttf");
+}
+@font-face {
+	font-family: "Poppins SemiBold";
+	src: url("../../../assets/fonts/Poppins-SemiBold.ttf");
+}
+@font-face {
+	font-family: "Poppins SemiBoldItalic";
+	src: url("../../../assets/fonts/Poppins-SemiBoldItalic.ttf");
+}
+@font-face {
+	font-family: "Poppins Thin";
+	src: url("../../../assets/fonts/Poppins-Thin.ttf");
+}
+@font-face {
+	font-family: "Poppins ThinItalic";
+	src: url("../../../assets/fonts/Poppins-ThinItalic.ttf");
+}
+
+#root {
 	position: relative;
 	color: #dbdee1;
 	height: 100vh;
 	background: #313338;
 	font-family: sans-serif;
-	overflow-y: hidden;
+	overflow: hidden;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	user-select: none;
+	font-size: 1.5rem;
 }
 
 .title {
@@ -19,4 +93,12 @@ body {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
+}
+
+.Login {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	width: 50%;
+	margin-top: 7rem;
 }

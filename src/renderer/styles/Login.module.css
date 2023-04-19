@@ -1,0 +1,56 @@
+.curve {
+	position: absolute;
+	background-color: #1e1f22;
+	height: 30rem;
+	width: 150%;
+	top: -10rem;
+	border-bottom-right-radius: 90% 100%;
+}
+
+.icon {
+	display: flex;
+	margin-bottom: 10rem;
+	position: absolute;
+	top: 5rem;
+}
+
+.intro {
+	margin-top: 1rem;
+	text-transform: uppercase;
+	text-align: center;
+	font-family: "Poppins SemiBold";
+}
+
+.footer {
+	text-transform: uppercase;
+	font-family: "Poppins ExtraLight";
+	margin-top: 3rem;
+	text-align: center;
+}
+
+.addProfile {
+	position: absolute;
+	bottom: 3.5rem;
+	right: 3.5rem;
+	background-color: aqua;
+	border-radius: 50%;
+	width: 5rem;
+	height: 5rem;
+	display: flex;
+	color: #1e1f22;
+	font-size: 3rem;
+	border-width: 0;
+	outline: 0;
+	transition: transform 300ms ease-out;
+	font-family: "Poppins Regular";
+	padding: 0;
+}
+
+.addProfile:hover:not(:disabled) {
+	background-color: aquamarine;
+	transform: rotate(0.5turn) scale(105%);
+}
+
+.addProfile:active:not(:disabled) {
+	transform: scale(95%);
+}

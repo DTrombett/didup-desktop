@@ -1,0 +1,25 @@
+.loading {
+	width: 15rem;
+	height: 7rem;
+	display: flex;
+	flex-direction: column;
+	background-color: rgba(71, 82, 196, 0.6);
+	border-radius: 20px;
+	justify-content: center;
+	align-items: center;
+}
+
+img {
+	margin-bottom: 0.3rem;
+}
+
+.background {
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	display: flex;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(1, 1, 1, 0.8);
+	z-index: 3;
+}
