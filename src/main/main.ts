@@ -1,4 +1,4 @@
-import { BrowserWindow, app, shell } from "electron";
+import { BrowserWindow, app, ipcMain, shell } from "electron";
 import { join, resolve } from "node:path";
 import {
 	argv,
@@ -9,16 +9,21 @@ import {
 	resourcesPath,
 } from "node:process";
 import { URL } from "node:url";
-import { Client, generateLoginLink, getToken } from "../../../portaleargo-api";
+import type { LoginLink } from "portaleargo-api";
+import { Client, generateLoginLink, getToken } from "portaleargo-api";
+import needLogin from "./api/needLogin";
 import installExtensions from "./utils/installExtensions";
 import MenuBuilder from "./utils/menu";
 import resolveHtmlPath from "./utils/resolveHtmlPath";
 
+if (!app.requestSingleInstanceLock()) {
+	app.quit();
+	exit();
+}
 let win: BrowserWindow | null = null;
-let urlData: ReturnType<typeof generateLoginLink>;
+let urlData: LoginLink | undefined;
 const protocol = "it.argosoft.didup.famiglia.new";
 const isDebug = env.NODE_ENV === "development" || env.DEBUG_PROD === "true";
-const gotTheLock = app.requestSingleInstanceLock();
 const client = new Client({
 	debug: true,
 });
@@ -27,7 +32,7 @@ const createWindow = async () => {
 	win = new BrowserWindow({
 		show: false,
 		autoHideMenuBar: true,
-		opacity: 0.8,
+		opacity: 0.9,
 		icon: join(
 			app.isPackaged
 				? join(resourcesPath, "assets")
@@ -41,7 +46,7 @@ const createWindow = async () => {
 		},
 	});
 	win.maximize();
-	win.loadURL(resolveHtmlPath("index.html")).catch(console.error);
+	win.loadURL(resolveHtmlPath("")).catch(console.error);
 	win.on("ready-to-show", () => {
 		if (!win) throw new Error('"mainWindow" is not defined');
 		win.show();
@@ -54,15 +59,13 @@ const createWindow = async () => {
 		return { action: "deny" };
 	});
 	new MenuBuilder(win).buildMenu();
-	await client.loadData();
-	urlData = generateLoginLink();
-	if (!client.token) win.loadURL(urlData.url).catch(console.error);
+	needLogin(client)
+		.then((login) =>
+			win?.loadURL(resolveHtmlPath(login ? "login" : "dashboard"))
+		)
+		.catch(console.error);
 };
 
-if (!gotTheLock) {
-	app.quit();
-	exit();
-}
 app.on("window-all-closed", () => {
 	// _Do not_ respect the OSX convention of having the application in memory even
 	// after all windows have been closed
@@ -74,23 +77,30 @@ app.on("second-instance", async (_, commandLine) => {
 	if (!win.isFocused()) win.focus();
 	const url = new URL(commandLine.at(-1)!);
 
-	if (url.hostname === "login-callback") {
+	if (
+		url.hostname === "login-callback" &&
+		url.searchParams.get("state") === urlData?.state
+	) {
 		const code = url.searchParams.get("code");
 
-		if (code == null) console.error("Code not found", code);
+		if (code == null) console.error("Code not found", url.searchParams);
 		else {
 			await getToken(client, {
 				codeVerifier: urlData.codeVerifier,
 				code,
 			}).catch(console.error);
-			console.log(client.token);
-			win.loadURL(resolveHtmlPath("index.html")).catch(console.error);
+			await client.login();
+			win.loadURL(resolveHtmlPath("login")).catch(console.error);
 		}
-	} else
-		win
-			.loadURL(resolveHtmlPath(url.href.slice(url.protocol.length + 2)))
-			.catch(console.error);
+	}
 });
+
+ipcMain.handle("getProfiles", () => (client.profile ? [client.profile] : []));
+ipcMain.on("login", () => {
+	urlData = generateLoginLink();
+	win?.loadURL(urlData.url).catch(console.error);
+});
+
 if (env.NODE_ENV === "production")
 	(
 		require("source-map-support") as {
@@ -111,4 +121,5 @@ if (defaultApp) {
 			resolve("."),
 		]);
 } else app.setAsDefaultProtocolClient(protocol);
+
 app.whenReady().then(createWindow).catch(console.error);
