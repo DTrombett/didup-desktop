@@ -1,14 +1,13 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { Profilo } from "portaleargo-api";
+import type { Client } from "portaleargo-api";
 
 type CallbackArgs<A = [], B = []> = [A, B];
 type Args = {
 	ping: CallbackArgs<[message: string], [message: string]>;
 	login: CallbackArgs;
 };
-type Invoke = {
-	getProfiles: CallbackArgs<[], Profilo[]>;
-};
+// type Invoke = {
+// };
 
 const electronHandler = {
 	ipcRenderer: {
@@ -31,8 +30,16 @@ const electronHandler = {
 		removeAllListeners<T extends keyof Args>(channel: T) {
 			ipcRenderer.removeAllListeners(channel);
 		},
-		invoke<T extends keyof Invoke>(channel: T, ...args: Invoke[T][0]) {
-			return ipcRenderer.invoke(channel, ...args) as Promise<Invoke[T][1]>;
+		// invoke<T extends keyof Invoke>(channel: T, ...args: Invoke[T][0]) {
+		// 	return ipcRenderer.invoke(channel, ...args) as Promise<Invoke[T][1]>;
+		// },
+		getClient<T extends keyof Client | undefined>(key: T) {
+			return ipcRenderer.invoke("client", key) as Promise<
+				T extends keyof Client ? Client[T] : Client
+			>;
+		},
+		log(this: void, ...args: unknown[]) {
+			ipcRenderer.send("log", ...args);
 		},
 	},
 };

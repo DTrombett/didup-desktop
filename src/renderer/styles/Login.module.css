@@ -39,9 +39,6 @@
 	display: flex;
 	color: #1e1f22;
 	font-size: 3rem;
-	border-width: 0;
-	outline: 0;
-	transition: transform 300ms ease-out;
 	font-family: "Poppins Regular";
 	padding: 0;
 }
@@ -51,6 +48,128 @@
 	transform: rotate(0.5turn) scale(105%);
 }
 
-.addProfile:active:not(:disabled) {
-	transform: scale(95%);
+.chooseProfile {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+}
+
+.header {
+	margin-top: 3rem;
+	font-family: "Poppins Medium";
+	text-transform: uppercase;
+}
+
+.grid {
+	display: flex;
+	flex-direction: column;
+	width: 80%;
+	height: 100%;
+	font-family: "Poppins Light";
+	font-size: large;
+}
+
+.profile {
+	margin: 3rem;
+	background-color: #1e1f22;
+	border-radius: 1rem;
+	padding: 2rem;
+	height: fit-content;
+}
+
+.profileHeader {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin-bottom: 1rem;
+}
+
+.profileIcon {
+	width: 5rem;
+	margin-right: 2rem;
+	height: 5rem;
+	padding: 1rem;
+	border-radius: 50%;
+	background-color: #dbdee1;
+}
+
+.profileDetails {
+	display: flex;
+	flex-direction: row;
+}
+
+.studentName {
+	margin-bottom: 0.5rem;
+}
+
+.className {
+	font-size: 15px;
+	color: aqua;
+	margin-bottom: 0.1rem;
+}
+
+.year {
+	color: grey;
+	font-size: 15px;
+}
+
+.schoolName {
+	font-family: "Poppins Regular";
+	margin-top: 1rem;
+}
+
+.options {
+	background-color: inherit;
+	border: 0;
+	border-radius: 50%;
+	margin-top: 1rem;
+	box-shadow: none !important;
+}
+
+.optionsImage {
+	width: 3rem;
+}
+
+.profileState {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin: 2rem 0;
+	text-transform: uppercase;
+}
+
+.join {
+	background-color: rgb(88, 101, 242);
+	border-radius: 50px;
+	padding: 1.5rem;
+	color: #dbdee1 !important;
+	font-size: 1rem;
+	font-family: "Poppins Light";
+	text-transform: uppercase;
+}
+
+.join:hover {
+	background-color: rgb(71, 82, 196);
+}
+
+.join:active {
+	background-color: rgb(60, 69, 165);
+}
+
+.state {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.stateImage {
+	width: 2rem;
+	margin-right: 1rem;
+}
+
+.details {
+	color: red;
+	text-transform: uppercase;
 }
