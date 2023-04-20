@@ -1,4 +1,5 @@
 {
+	"name": "DidUp Desktop",
 	"description": "A desktop app to access your school data based on didUP - Famiglia mobile",
 	"keywords": [
 		"electron",
@@ -110,8 +111,8 @@
 		"webpack-merge": "^5.8.0"
 	},
 	"build": {
-		"productName": "ElectronReact",
-		"appId": "org.erb.ElectronReact",
+		"productName": "DidUp Desktop",
+		"appId": "org.erb.DidUpDesktop",
 		"asar": true,
 		"asarUnpack": "**\\*.{node,dll}",
 		"files": [

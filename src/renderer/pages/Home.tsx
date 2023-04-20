@@ -1,5 +1,5 @@
-import icon from "../../../assets/icon.svg";
 import loading from "../../../assets/loading.gif";
+import icon from "../../../assets/vario/nuovo-logo.svg";
 import styles from "../styles/Home.module.css";
 
 export default function Home() {

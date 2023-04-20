@@ -77,7 +77,7 @@
 	height: 100vh;
 	background: #313338;
 	font-family: sans-serif;
-	overflow: hidden;
+	overflow: auto;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -87,6 +87,20 @@
 
 .title {
 	color: #dbdee1;
+}
+
+.button {
+	transition: transform 100ms ease-out;
+	border-width: 0;
+}
+
+.button:hover:not(:disabled),
+.button:focus:not(:disabled) {
+	transform: scale(105%);
+}
+
+.button:active:not(:disabled) {
+	transform: scale(95%);
 }
 
 .Home {
