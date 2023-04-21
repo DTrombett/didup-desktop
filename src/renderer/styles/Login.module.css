@@ -41,11 +41,12 @@
 	font-size: 3rem;
 	font-family: "Poppins Regular";
 	padding: 0;
+	transition: transform 250ms ease-out !important;
 }
 
 .addProfile:hover:not(:disabled) {
 	background-color: aquamarine;
-	transform: rotate(0.5turn) scale(105%);
+	transform: rotate(0.5turn) scale(105%) !important;
 }
 
 .chooseProfile {
