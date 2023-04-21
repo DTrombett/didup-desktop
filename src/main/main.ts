@@ -20,20 +20,21 @@ if (!app.requestSingleInstanceLock()) {
 	app.quit();
 	exit();
 }
-let urlData: LoginLink | undefined;
 let win: BrowserWindow | null = null;
+let urlData: LoginLink | undefined;
+let loadUrl = resolveHtmlPath("");
 const protocol = "it.argosoft.didup.famiglia.new";
-const isDebug = env.NODE_ENV === "development" || env.DEBUG_PROD === "true";
+const debug = env.NODE_ENV === "development" || env.DEBUG_PROD === "true";
 const client = new Client({
-	debug: true,
+	debug,
 	dataPath: join(app.getPath("userData"), "argo"),
 });
 const createWindow = async () => {
-	if (isDebug) await installExtensions();
+	if (debug) await installExtensions();
 	win = new BrowserWindow({
 		show: false,
 		autoHideMenuBar: true,
-		// opacity: 0.9,
+		opacity: 0.9,
 		icon: join(
 			app.isPackaged
 				? join(resourcesPath, "assets")
@@ -48,8 +49,7 @@ const createWindow = async () => {
 		minWidth: 600,
 		minHeight: 600,
 	});
-	win.loadURL(resolveHtmlPath("")).catch(console.error);
-	prepareClient(client, win).catch(console.error);
+	win.loadURL(loadUrl).catch(console.error);
 	win.maximize();
 	win.focus();
 	win.on("ready-to-show", () => {
@@ -75,6 +75,13 @@ const createWindow = async () => {
 	new MenuBuilder(win).buildMenu();
 };
 
+prepareClient(client)
+	.then((url) => {
+		if (win) return win.loadURL(url);
+		loadUrl = url;
+		return undefined;
+	})
+	.catch(console.error);
 app.on("window-all-closed", () => {
 	// _Do not_ respect the OSX convention of having the application in memory even
 	// after all windows have been closed
@@ -121,7 +128,7 @@ if (env.NODE_ENV === "production")
 			install(): void;
 		}
 	).install();
-if (isDebug) (require("electron-debug") as () => void)();
+if (debug) (require("electron-debug") as () => void)();
 if (defaultApp) {
 	if (argv.length >= 2)
 		app.setAsDefaultProtocolClient(protocol, execPath, [
