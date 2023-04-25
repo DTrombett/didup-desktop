@@ -72,12 +72,15 @@
 }
 
 #root {
+	--background-color: #313338;
+	--text-color: #dbdee1;
+	--embed-color: #2b2d31;
 	position: relative;
-	color: #dbdee1;
+	color: var(--text-color);
 	height: 100vh;
-	background: #313338;
+	background: var(--background-color);
 	font-family: sans-serif;
-	overflow: auto;
+	overflow: hidden;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -86,7 +89,7 @@
 }
 
 .title {
-	color: #dbdee1;
+	color: var(--text-color);
 }
 
 .button {
@@ -103,7 +106,7 @@
 	transform: scale(95%);
 }
 
-.Home {
+.Splash {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
@@ -115,4 +118,12 @@
 	flex-direction: column;
 	width: 50%;
 	margin-top: 7rem;
+}
+
+.ProfileDetails {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	height: 100%;
 }

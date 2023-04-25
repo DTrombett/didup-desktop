@@ -14,6 +14,7 @@ module.exports = {
 		"import/no-extraneous-dependencies": "off",
 		"global-require": "off",
 		"no-console": "off",
+		"react/require-default-props": "off",
 		"react/react-in-jsx-scope": "off",
 		"react/jsx-filename-extension": "off",
 		"import/extensions": "off",

@@ -1,9 +1,7 @@
 import type { Login as LoginData, Profilo } from "portaleargo-api";
 import { useState } from "react";
 import Loading from "renderer/components/Loading";
-import user from "../../../assets/avatar/pupo.svg";
-import active from "../../../assets/profile/icon-utente-in-uso.svg";
-import options from "../../../assets/profile/opzioni.svg";
+import Profile from "renderer/components/Profile";
 import icon from "../../../assets/vario/nuovo-logo.svg";
 import styles from "../styles/Login.module.css";
 
@@ -27,68 +25,12 @@ export default function Login() {
 	}
 	if (details) {
 		const [profile, login] = details;
+
 		return (
 			<div className={styles.chooseProfile}>
-				<div className={styles.header}>Scelta profilo</div>
+				<span className={styles.header}>Scelta profilo</span>
 				<div className={styles.grid}>
-					<div className={styles.profile}>
-						<div className={styles.profileHeader}>
-							<div className={styles.profileDetails}>
-								<img src={user} alt="profile" className={styles.profileIcon} />
-								<div>
-									<div className={styles.studentName}>
-										{profile.alunno.cognome} {profile.alunno.nome}
-									</div>
-									<div className={styles.className}>
-										{profile.classe.classe}
-										{profile.classe.sezione}
-									</div>
-									<div className={styles.year}>
-										{new Date(profile.anno.dataInizio).getFullYear()}/
-										{new Date(profile.anno.dataFine).getFullYear()}
-									</div>
-								</div>
-							</div>
-							<button
-								className={`${styles.options} button`}
-								type="button"
-								onClick={() => {
-									window.location.pathname = "profiledetails";
-								}}
-							>
-								<img
-									src={options}
-									alt="options"
-									className={styles.optionsImage}
-								/>
-							</button>
-						</div>
-						<div className={styles.schoolName}>
-							{profile.corso.descrizione} - {profile.plesso.descrizione}
-						</div>
-						<div className={styles.profileState}>
-							<div className={styles.state}>
-								<img src={active} alt="active" className={styles.stateImage} />
-								<div>In uso</div>
-							</div>
-							<button
-								className={`${styles.join} button`}
-								onClick={() => {
-									window.location.pathname = "dashboard";
-								}}
-								type="button"
-							>
-								Entra nel profilo
-							</button>
-						</div>
-						<div className={styles.details}>
-							Cod. Scuola: {login.schoolCode}
-							<br />
-							Utente: {login.username}
-							<br />
-							Account genitore intestato a {profile.genitore.nomeCompleto}
-						</div>
-					</div>
+					<Profile login={login} profile={profile} state />
 				</div>
 			</div>
 		);

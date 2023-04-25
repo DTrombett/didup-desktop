@@ -1,11 +1,11 @@
-import "renderer/styles/loading.css";
 import icon from "../../../assets/loading.gif";
+import styles from "../styles/Loading.module.css";
 
 export default function Loading() {
 	return (
-		<div className="background">
-			<div className="loading">
-				<img src={icon} alt="loading" width="30" />
+		<div className={styles.background}>
+			<div className={styles.loading}>
+				<img src={icon} alt="loading" width="30" className={styles.img} />
 				Attendere...
 			</div>
 		</div>
