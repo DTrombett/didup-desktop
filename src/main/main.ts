@@ -1,4 +1,4 @@
-import { BrowserWindow, app, ipcMain } from "electron";
+import { BrowserWindow, app, ipcMain, shell } from "electron";
 import { join, resolve } from "node:path";
 import {
 	argv,
@@ -30,11 +30,10 @@ const client = new Client({
 	dataPath: join(app.getPath("userData"), "argo"),
 });
 const createWindow = async () => {
-	if (debug) await installExtensions();
+	if (debug) void installExtensions();
 	win = new BrowserWindow({
 		show: false,
 		autoHideMenuBar: true,
-		opacity: 0.9,
 		icon: join(
 			app.isPackaged
 				? join(resourcesPath, "assets")
@@ -49,6 +48,7 @@ const createWindow = async () => {
 		minWidth: 600,
 		minHeight: 600,
 	});
+	new MenuBuilder(win).buildMenu();
 	win.loadURL(loadUrl).catch(console.error);
 	win.maximize();
 	win.focus();
@@ -72,7 +72,10 @@ const createWindow = async () => {
 				event.preventDefault();
 			}
 	});
-	new MenuBuilder(win).buildMenu();
+	win.webContents.setWindowOpenHandler(({ url }) => {
+		shell.openExternal(url).catch(console.error);
+		return { action: "deny" };
+	});
 };
 
 prepareClient(client)

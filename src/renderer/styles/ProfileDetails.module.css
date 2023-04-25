@@ -1,0 +1,17 @@
+.header {
+	width: 100%;
+	margin-top: 3rem;
+	font-family: "Poppins Medium";
+	text-transform: uppercase;
+}
+
+.title {
+	text-align: center;
+}
+
+.backIcon {
+	position: absolute;
+	margin-left: 3rem;
+	background-color: inherit;
+	box-shadow: none !important;
+}
