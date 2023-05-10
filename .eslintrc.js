@@ -10,13 +10,15 @@ module.exports = {
 	],
 	ignorePatterns: ["**/*.d.ts"],
 	rules: {
-		// A temporary hack related to IDE not resolving correct package.json
 		"import/no-extraneous-dependencies": "off",
 		"global-require": "off",
 		"no-console": "off",
 		"react/require-default-props": "off",
 		"react/react-in-jsx-scope": "off",
 		"react/jsx-filename-extension": "off",
+		"react/function-component-definition": "off",
+		"react/destructuring-assignment": "off",
+		"react/state-in-constructor": "off",
 		"import/extensions": "off",
 		"import/no-unresolved": "off",
 		"import/no-import-module-exports": "off",

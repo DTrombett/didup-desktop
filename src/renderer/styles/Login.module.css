@@ -48,26 +48,3 @@
 	background-color: aquamarine;
 	transform: rotate(0.5turn) scale(105%) !important;
 }
-
-.chooseProfile {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 100%;
-	height: 100%;
-}
-
-.header {
-	margin-top: 3rem;
-	font-family: "Poppins Medium";
-	text-transform: uppercase;
-}
-
-.grid {
-	display: flex;
-	flex-direction: column;
-	width: 80%;
-	height: 100%;
-	font-family: "Poppins Light";
-	font-size: large;
-}

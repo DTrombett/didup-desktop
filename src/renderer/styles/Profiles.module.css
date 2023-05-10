@@ -1,0 +1,14 @@
+.header {
+	margin-top: 3rem;
+	font-family: "Poppins Medium";
+	text-transform: uppercase;
+}
+
+.grid {
+	display: flex;
+	flex-direction: column;
+	width: 80%;
+	height: 100%;
+	font-family: "Poppins Light";
+	font-size: large;
+}

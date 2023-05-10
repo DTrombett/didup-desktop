@@ -72,9 +72,11 @@
 }
 
 #root {
-	--background-color: #313338;
-	--text-color: #dbdee1;
-	--embed-color: #2b2d31;
+	--background-color: #202020;
+	--text-color: #ffffff;
+	--embed-color: #272727;
+	--link-color: #afd5da;
+	--red-color: #ff3442;
 	position: relative;
 	color: var(--text-color);
 	height: 100vh;
@@ -121,6 +123,14 @@
 }
 
 .ProfileDetails {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+}
+
+.Profiles {
 	display: flex;
 	flex-direction: column;
 	align-items: center;

@@ -13,7 +13,6 @@ import type { LoginLink } from "portaleargo-api";
 import { Client, generateLoginLink, getToken } from "portaleargo-api";
 import installExtensions from "./utils/installExtensions";
 import MenuBuilder from "./utils/menu";
-import prepareClient from "./utils/prepareClient";
 import resolveHtmlPath from "./utils/resolveHtmlPath";
 
 if (!app.requestSingleInstanceLock()) {
@@ -22,18 +21,18 @@ if (!app.requestSingleInstanceLock()) {
 }
 let win: BrowserWindow | null = null;
 let urlData: LoginLink | undefined;
-let loadUrl = resolveHtmlPath("");
 const protocol = "it.argosoft.didup.famiglia.new";
 const debug = env.NODE_ENV === "development" || env.DEBUG_PROD === "true";
 const client = new Client({
 	debug,
-	dataPath: join(app.getPath("userData"), "argo"),
+	dataPath: join(app.getPath("userData"), ".argo"),
 });
 const createWindow = async () => {
 	if (debug) void installExtensions();
 	win = new BrowserWindow({
 		show: false,
 		autoHideMenuBar: true,
+		opacity: 0.99,
 		icon: join(
 			app.isPackaged
 				? join(resourcesPath, "assets")
@@ -49,7 +48,7 @@ const createWindow = async () => {
 		minHeight: 600,
 	});
 	new MenuBuilder(win).buildMenu();
-	win.loadURL(loadUrl).catch(console.error);
+	win.loadURL(resolveHtmlPath("")).catch(console.error);
 	win.maximize();
 	win.focus();
 	win.on("ready-to-show", () => {
@@ -78,13 +77,6 @@ const createWindow = async () => {
 	});
 };
 
-prepareClient(client)
-	.then((url) => {
-		if (win) return win.loadURL(url);
-		loadUrl = url;
-		return undefined;
-	})
-	.catch(console.error);
 app.on("window-all-closed", () => {
 	// _Do not_ respect the OSX convention of having the application in memory even
 	// after all windows have been closed
@@ -108,14 +100,14 @@ app.on("second-instance", async (_, commandLine) => {
 				code,
 			}).catch(console.error);
 			await client.login();
-			win.loadURL(resolveHtmlPath("login")).catch(console.error);
+			win.loadURL(resolveHtmlPath("profiles")).catch(console.error);
 			win.webContents.clearHistory();
 		}
 	}
 });
 
-ipcMain.handle("client", (_event, key?: keyof Client) =>
-	key ? client[key] : client
+ipcMain.handle("client", (_event, ...keys: (keyof Client)[]) =>
+	Object.fromEntries(keys.map((k) => [k, client[k]]))
 );
 ipcMain.on("login", () => {
 	urlData = generateLoginLink();
@@ -124,6 +116,25 @@ ipcMain.on("login", () => {
 ipcMain.on("log", (_event, ...args) => {
 	console.log(...args);
 });
+ipcMain.handle(
+	"invokeClientMethod",
+	<
+		T extends Extract<
+			{
+				[K in keyof Client]: Client[K] extends (...args: any[]) => any
+					? K
+					: never;
+			}[keyof Client],
+			keyof Client
+		>
+	>(
+		_event: unknown,
+		key: T,
+		...args: Parameters<Client[T]>
+	) => {
+		(client[key] as (...params: Parameters<Client[T]>) => any)(...args);
+	}
+);
 
 if (env.NODE_ENV === "production")
 	(

@@ -33,7 +33,7 @@
 
 .className {
 	font-size: 15px;
-	color: aqua;
+	color: var(--link-color);
 	margin-bottom: 0.1rem;
 }
 
@@ -71,7 +71,7 @@
 	background-color: #5865f2;
 	border-radius: 50px;
 	padding: 1.5rem;
-	color: #dbdee1 !important;
+	color: var(--text-color) !important;
 	font-size: 1rem;
 	font-family: "Poppins Light";
 	text-transform: uppercase;
@@ -97,6 +97,6 @@
 }
 
 .details {
-	color: red;
+	color: var(--red-color);
 	text-transform: uppercase;
 }

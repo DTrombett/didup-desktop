@@ -9,41 +9,47 @@ type Args = {
 // type Invoke = {
 // };
 
-const electronHandler = {
-	ipcRenderer: {
-		send<T extends keyof Args>(channel: T, ...args: Args[T][0]) {
-			ipcRenderer.send(channel, ...args);
-		},
-		on<T extends keyof Args>(channel: T, func: (...args: Args[T][1]) => void) {
-			ipcRenderer.on(channel, (_event, ...args: any) => {
-				func(...args);
-			});
-		},
-		once<T extends keyof Args>(
-			channel: T,
-			func: (...args: Args[T][1]) => void
-		) {
-			ipcRenderer.once(channel, (_event, ...args: any) => {
-				func(...args);
-			});
-		},
-		removeAllListeners<T extends keyof Args>(channel: T) {
-			ipcRenderer.removeAllListeners(channel);
-		},
-		// invoke<T extends keyof Invoke>(channel: T, ...args: Invoke[T][0]) {
-		// 	return ipcRenderer.invoke(channel, ...args) as Promise<Invoke[T][1]>;
-		// },
-		getClient<T extends keyof Client | undefined>(key: T) {
-			return ipcRenderer.invoke("client", key) as Promise<
-				T extends keyof Client ? Client[T] : Client
-			>;
-		},
-		log(this: void, ...args: unknown[]) {
-			ipcRenderer.send("log", ...args);
-		},
+const electron = {
+	send<T extends keyof Args>(channel: T, ...args: Args[T][0]) {
+		ipcRenderer.send(channel, ...args);
+	},
+	on<T extends keyof Args>(channel: T, func: (...args: Args[T][1]) => void) {
+		ipcRenderer.on(channel, (_event, ...args: any) => {
+			func(...args);
+		});
+	},
+	once<T extends keyof Args>(channel: T, func: (...args: Args[T][1]) => void) {
+		ipcRenderer.once(channel, (_event, ...args: any) => {
+			func(...args);
+		});
+	},
+	removeAllListeners<T extends keyof Args>(channel: T) {
+		ipcRenderer.removeAllListeners(channel);
+	},
+	getClient<T extends keyof Client>(first: T, ...keys: T[]) {
+		return ipcRenderer.invoke("client", first, ...keys) as Promise<
+			Pick<Client, T>
+		>;
+	},
+	log(this: void, ...args: unknown[]) {
+		ipcRenderer.send("log", ...args);
+	},
+	invokeClientMethod<
+		T extends Extract<
+			{
+				[K in keyof Client]: Client[K] extends (...args: any[]) => any
+					? K
+					: never;
+			}[keyof Client],
+			keyof Client
+		>
+	>(key: T, ...args: Parameters<Client[T]>) {
+		return ipcRenderer.invoke("invokeClientMethod", key, ...args) as Promise<
+			Awaited<ReturnType<Client[T]>>
+		>;
 	},
 };
 
-contextBridge.exposeInMainWorld("electron", electronHandler);
+contextBridge.exposeInMainWorld("electron", electron);
 
-export type ElectronHandler = typeof electronHandler;
+export type ElectronHandler = typeof electron;
