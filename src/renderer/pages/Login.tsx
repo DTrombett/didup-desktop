@@ -1,40 +1,11 @@
-import type { Login as LoginData, Profilo } from "portaleargo-api";
 import { useState } from "react";
 import Loading from "renderer/components/Loading";
-import Profile from "renderer/components/Profile";
 import icon from "../../../assets/vario/nuovo-logo.svg";
 import styles from "../styles/Login.module.css";
 
-export default function Login() {
-	const [details, setDetails] = useState<
-		[Profilo, LoginData] | null | undefined
-	>(null);
-	const [loading, setLoading] = useState(true);
+export default () => {
+	const [loading, setLoading] = useState(false);
 
-	if (details === null) {
-		Promise.all([
-			window.electron.ipcRenderer.getClient("profile"),
-			window.electron.ipcRenderer.getClient("loginData"),
-		])
-			.then(([p, l]) => {
-				setDetails(p && l && [p, l]);
-				setLoading(false);
-			})
-			.catch(window.electron.ipcRenderer.log);
-		return <Loading />;
-	}
-	if (details) {
-		const [profile, login] = details;
-
-		return (
-			<div className={styles.chooseProfile}>
-				<span className={styles.header}>Scelta profilo</span>
-				<div className={styles.grid}>
-					<Profile login={login} profile={profile} state />
-				</div>
-			</div>
-		);
-	}
 	return (
 		<>
 			{loading && <Loading />}
@@ -59,7 +30,7 @@ export default function Login() {
 					disabled={loading}
 					onClick={() => {
 						setLoading(true);
-						window.electron.ipcRenderer.send("login");
+						window.electron.send("login");
 					}}
 				>
 					+
@@ -67,4 +38,4 @@ export default function Login() {
 			</div>
 		</>
 	);
-}
+};

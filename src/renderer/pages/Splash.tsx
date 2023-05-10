@@ -1,8 +1,31 @@
+import { useContext, useEffect } from "react";
+import { Navigate } from "react-router-dom";
+import Context from "renderer/Context";
 import loading from "../../../assets/loading.gif";
 import icon from "../../../assets/vario/nuovo-logo.svg";
 import styles from "../styles/Splash.module.css";
 
-export default function Splash() {
+export default () => {
+	const context = useContext(Context);
+
+	if (context.dashboard) return <Navigate replace to="/dashboard" />;
+	if (context.dashboard === null)
+		useEffect(() => {
+			const prepare = async () => {
+				let { token } = await window.electron.getClient("token");
+
+				if (!token) {
+					await window.electron.invokeClientMethod("loadData");
+					({ token } = await window.electron.getClient("token"));
+				}
+				if (token) await window.electron.invokeClientMethod("login");
+				return context.loadDashboard();
+			};
+
+			prepare().catch(window.electron.log);
+		}, [context]);
+	if (context.dashboard === undefined) return <Navigate replace to="/login" />;
+
 	return (
 		<div className="Splash">
 			<img alt="icon" className={styles.icon} src={icon} />
@@ -11,4 +34,4 @@ export default function Splash() {
 			<img src={loading} alt="loading" className={styles.loading} />
 		</div>
 	);
-}
+};
