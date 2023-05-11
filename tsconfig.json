@@ -4,10 +4,7 @@
 		"incremental": true,
 		"target": "es2021",
 		"module": "commonjs",
-		"lib": [
-			"dom",
-			"es2021"
-		],
+		"lib": ["dom", "es2022"],
 		"jsx": "react-jsx",
 		"strict": true,
 		"sourceMap": true,
@@ -23,15 +20,9 @@
 		"newLine": "lf",
 		"skipLibCheck": true,
 		"noFallthroughCasesInSwitch": true,
-		"noImplicitOverride": true,
 		"noImplicitThis": true,
 		"noUnusedLocals": true,
-		"noUnusedParameters": true,
+		"noUnusedParameters": true
 	},
-	"exclude": [
-		"test",
-		"release/build",
-		"release/app/dist",
-		".erb/dll"
-	]
+	"include": ["src/", "assets/"]
 }

@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 import "bulma/css/bulma.min.css";
 import type {
 	Dashboard as DashboardData,
 	Login as LoginData,
 	Profilo,
+	Token,
 } from "portaleargo-api";
 import { Component } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
@@ -10,24 +12,47 @@ import { Provider } from "./Context";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import ProfileDetails from "./pages/ProfileDetails";
+import Profiles from "./pages/Profiles";
 import Splash from "./pages/Splash";
 import "./styles/index.css";
-import Profiles from "./pages/Profiles";
 
 export default class App extends Component {
-	override state: {
-		dashboard?: DashboardData | null;
-		profileData?: { profile: Profilo; loginData: LoginData } | null;
+	static loadStorage<T>(key: string) {
+		const item = localStorage.getItem(key);
+
+		if (item == null) return undefined;
+		try {
+			return JSON.parse(item) as T;
+		} catch (err) {
+			return undefined;
+		}
+	}
+
+	state: {
+		dashboard?: DashboardData;
+		profile?: Profilo;
+		loginData?: LoginData;
+		token?: Token;
 	} = {
-		dashboard: null,
-		profileData: null,
+		profile: App.loadStorage<Profilo>("profile"),
+		loginData: App.loadStorage<LoginData>("login"),
+		token: App.loadStorage<Token>("token"),
 	};
 
 	// constructor(props: Record<string, never>) {
 	// 	super(props);
 	// }
 
-	override setState<K extends keyof this["state"]>(
+	async componentDidMount() {
+		if (this.state.loginData) {
+			await window.electron.invokeClientMethod("login", false);
+			this.setState({
+				dashboard: App.loadStorage<DashboardData>("dashboard"),
+			});
+		}
+	}
+
+	setState<K extends keyof this["state"]>(
 		state:
 			| Pick<this["state"], K>
 			| this["state"]
@@ -41,25 +66,32 @@ export default class App extends Component {
 		super.setState(state, callback);
 	}
 
-	override render() {
+	render() {
 		return (
 			<Provider
 				value={{
-					profileData: this.state.profileData,
+					loginData: this.state.loginData,
+					profile: this.state.profile,
 					dashboard: this.state.dashboard,
-					loadDashboard: async () => {
-						this.setState(await window.electron.getClient("dashboard"));
-					},
-					loadProfileDetails: async () => {
+					token: this.state.token,
+					loadDashboard: () => {
 						this.setState({
-							profileData: await window.electron
-								.getClient("profile", "loginData")
-								.then(
-									(data) =>
-										data.loginData &&
-										data.profile &&
-										(data as Required<typeof data>)
-								),
+							dashboard: App.loadStorage<DashboardData>("dashboard"),
+						});
+					},
+					loadProfile: () => {
+						this.setState({
+							profile: App.loadStorage<Profilo>("profile"),
+						});
+					},
+					loadLoginData: () => {
+						this.setState({
+							loginData: App.loadStorage<LoginData>("login"),
+						});
+					},
+					loadToken: () => {
+						this.setState({
+							token: App.loadStorage<Token>("token"),
 						});
 					},
 				}}

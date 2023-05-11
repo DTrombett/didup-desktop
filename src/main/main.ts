@@ -25,7 +25,46 @@ const protocol = "it.argosoft.didup.famiglia.new";
 const debug = env.NODE_ENV === "development" || env.DEBUG_PROD === "true";
 const client = new Client({
 	debug,
-	dataPath: join(app.getPath("userData"), ".argo"),
+	dataProvider: {
+		read: async (name: string) => {
+			if (!win) return undefined;
+			const text: string | null = await win.webContents.executeJavaScript(
+				`localStorage.getItem("${name}")`
+			);
+
+			if (text == null) return undefined;
+			try {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+				return JSON.parse(text);
+			} catch (err) {
+				console.error(err);
+				return undefined;
+			}
+		},
+		write: async (name, data) => {
+			if (!win) return undefined;
+			const nonce = Math.random();
+
+			win.webContents.send("write", name, JSON.stringify(data), nonce);
+			return new Promise((_resolve) => {
+				const listener: (
+					event: Electron.IpcMainEvent,
+					...args: any[]
+				) => void = (_event, n) => {
+					if (n === nonce) {
+						ipcMain.removeListener("write", listener);
+						_resolve();
+					}
+				};
+
+				ipcMain.on("write", listener);
+			});
+		},
+		reset: async () => {
+			if (!win) return undefined;
+			return win.webContents.executeJavaScript("localStorage.clear()");
+		},
+	},
 });
 const createWindow = async () => {
 	if (debug) void installExtensions();
@@ -116,7 +155,7 @@ ipcMain.handle("client", (_event, ...keys: (keyof Client)[]) =>
 );
 ipcMain.on("login", () => {
 	urlData = generateLoginLink();
-	win?.loadURL(urlData.url).catch(console.error);
+	shell.openExternal(urlData.url).catch(console.error);
 });
 ipcMain.on("log", (_event, ...args) => {
 	console.log(...args);
@@ -135,8 +174,15 @@ ipcMain.handle(
 	>(
 		_event: unknown,
 		key: T,
+		pass: boolean,
 		...args: Parameters<Client[T]>
-	) => (client[key] as (...params: Parameters<Client[T]>) => unknown)(...args)
+	) => {
+		const result = (
+			client[key] as (...params: Parameters<Client[T]>) => unknown
+		)(...args);
+
+		return pass ? result : undefined;
+	}
 );
 
 if (env.NODE_ENV === "production")

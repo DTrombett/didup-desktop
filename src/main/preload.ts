@@ -5,9 +5,11 @@ type CallbackArgs<A = [], B = []> = [A, B];
 type Args = {
 	ping: CallbackArgs<[message: string], [message: string]>;
 	login: CallbackArgs;
+	write: CallbackArgs<
+		[nonce: number],
+		[name: string, value: string, nonce: number]
+	>;
 };
-// type Invoke = {
-// };
 
 const electron = {
 	send<T extends keyof Args>(channel: T, ...args: Args[T][0]) {
@@ -41,10 +43,13 @@ const electron = {
 			}[keyof Client],
 			keyof Client
 		>
-	>(key: T, ...args: Parameters<Client[T]>) {
-		return ipcRenderer.invoke("invokeClientMethod", key, ...args) as Promise<
-			Awaited<ReturnType<Client[T]>>
-		>;
+	>(key: T, pass = true, ...args: Parameters<Client[T]>) {
+		return ipcRenderer.invoke(
+			"invokeClientMethod",
+			key,
+			pass,
+			...args
+		) as Promise<Awaited<ReturnType<Client[T]>>>;
 	},
 };
 
