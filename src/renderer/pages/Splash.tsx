@@ -25,7 +25,6 @@ export default () => {
 			prepare().catch(window.electron.log);
 		}, [context]);
 	if (context.dashboard === undefined) return <Navigate replace to="/login" />;
-
 	return (
 		<div className="Splash">
 			<img alt="icon" className={styles.icon} src={icon} />

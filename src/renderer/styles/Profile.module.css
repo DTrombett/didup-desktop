@@ -4,6 +4,8 @@
 	border-radius: 1rem;
 	padding: 2rem;
 	height: fit-content;
+	font-family: "Poppins Light";
+	font-size: large;
 }
 
 .profileHeader {
@@ -45,6 +47,7 @@
 .schoolName {
 	font-family: "Poppins Regular";
 	margin-top: 1rem;
+	margin-bottom: 2rem;
 }
 
 .options {
@@ -63,7 +66,7 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	margin: 2rem 0;
+	/* margin: 2rem 0; */
 	text-transform: uppercase;
 }
 
@@ -99,4 +102,5 @@
 .details {
 	color: var(--red-color);
 	text-transform: uppercase;
+	margin-top: 2rem;
 }

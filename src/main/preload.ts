@@ -26,10 +26,8 @@ const electron = {
 	removeAllListeners<T extends keyof Args>(channel: T) {
 		ipcRenderer.removeAllListeners(channel);
 	},
-	getClient<T extends keyof Client>(first: T, ...keys: T[]) {
-		return ipcRenderer.invoke("client", first, ...keys) as Promise<
-			Pick<Client, T>
-		>;
+	getClient<T extends keyof Client>(...keys: T[] & [T]) {
+		return ipcRenderer.invoke("client", ...keys) as Promise<Pick<Client, T>>;
 	},
 	log(this: void, ...args: unknown[]) {
 		ipcRenderer.send("log", ...args);

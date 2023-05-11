@@ -16,6 +16,10 @@ export default () => {
 		}, [context]);
 		return <Loading />;
 	}
+	if (!context.dashboard)
+		useEffect(() => {
+			context.loadDashboard().catch(window.electron.log);
+		}, [context]);
 	return (
 		<div className="Profiles">
 			<span className={styles.header}>Scelta profilo</span>
