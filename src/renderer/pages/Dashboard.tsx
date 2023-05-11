@@ -13,9 +13,15 @@ export default () => {
 		}, [context]);
 		return <Loading />;
 	}
+	if (!context.profileData)
+		useEffect(() => {
+			context.loadProfileDetails().catch(window.electron.log);
+		}, [context]);
 	return (
 		<div>
-			<Link to="/">Reload</Link>
+			<span>This is the Dashboard</span>
+			<br />
+			<Link to="/profiles">Go to Profiles</Link>
 		</div>
 	);
 };

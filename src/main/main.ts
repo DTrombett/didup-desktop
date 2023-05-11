@@ -60,7 +60,7 @@ const createWindow = async () => {
 	});
 	win.webContents.on("before-input-event", (event, input) => {
 		if (!win) return;
-		if (input.alt)
+		if (input.alt) {
 			if (input.key === "ArrowLeft") {
 				if (new URL(win.webContents.getURL()).pathname !== "/login") {
 					win.webContents.goBack();
@@ -68,6 +68,11 @@ const createWindow = async () => {
 				}
 			} else if (input.key === "ArrowRight") {
 				win.webContents.goForward();
+				event.preventDefault();
+			}
+		} else if (input.control)
+			if (input.key === "r") {
+				win.loadURL(resolveHtmlPath("")).catch(console.error);
 				event.preventDefault();
 			}
 	});
@@ -131,9 +136,7 @@ ipcMain.handle(
 		_event: unknown,
 		key: T,
 		...args: Parameters<Client[T]>
-	) => {
-		(client[key] as (...params: Parameters<Client[T]>) => any)(...args);
-	}
+	) => (client[key] as (...params: Parameters<Client[T]>) => unknown)(...args)
 );
 
 if (env.NODE_ENV === "production")
@@ -157,4 +160,4 @@ if (defaultApp) {
 		]);
 } else app.setAsDefaultProtocolClient(protocol);
 
-app.whenReady().then(createWindow).catch(console.error);
+void app.whenReady().then(createWindow);
