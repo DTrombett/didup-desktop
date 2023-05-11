@@ -1,34 +1,23 @@
-import { useContext, useEffect } from "react";
-import styles from "../styles/Profiles.module.css";
+import { useContext } from "react";
+import { Navigate } from "react-router-dom";
 import Context from "renderer/Context";
 import Profile from "renderer/components/Profile";
-import { Navigate } from "react-router-dom";
-import Loading from "renderer/components/Loading";
+import styles from "../styles/Profiles.module.css";
 
 export default () => {
 	const context = useContext(Context);
 
-	if (context.profileData === undefined)
+	if (!context.loginData || !context.profile)
 		return <Navigate replace to="/login" />;
-	if (context.profileData === null) {
-		useEffect(() => {
-			context.loadProfileDetails().catch(window.electron.log);
-		}, [context]);
-		return <Loading />;
-	}
-	if (!context.dashboard)
-		useEffect(() => {
-			context.loadDashboard().catch(window.electron.log);
-		}, [context]);
 	return (
 		<div className="Profiles">
 			<span className={styles.header}>Scelta profilo</span>
 			<div className={styles.grid}>
 				<Profile
-					login={context.profileData.loginData}
-					profile={context.profileData.profile}
+					login={context.loginData}
+					profile={context.profile}
 					state
-					key={context.profileData.profile.id}
+					key={context.profile.id}
 				/>
 			</div>
 		</div>

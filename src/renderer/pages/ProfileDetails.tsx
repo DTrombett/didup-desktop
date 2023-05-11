@@ -1,22 +1,15 @@
+import { useContext } from "react";
+import { Navigate } from "react-router-dom";
+import Context from "renderer/Context";
 import Profile from "renderer/components/Profile";
 import backArrow from "../../../assets/backArrow.svg";
 import styles from "../styles/ProfileDetails.module.css";
-import { useContext, useEffect } from "react";
-import Context from "renderer/Context";
-import { Navigate } from "react-router-dom";
-import Loading from "renderer/components/Loading";
 
 export default () => {
 	const context = useContext(Context);
 
-	if (context.profileData === undefined)
+	if (!context.profile || !context.loginData)
 		return <Navigate replace to="/login" />;
-	if (context.profileData === null) {
-		useEffect(() => {
-			context.loadProfileDetails().catch(window.electron.log);
-		}, [context]);
-		return <Loading />;
-	}
 	return (
 		<div className="ProfileDetails">
 			<div className={styles.header}>
@@ -31,9 +24,9 @@ export default () => {
 				</button>
 				<div className={styles.title}>Dettaglio profilo</div>
 				<Profile
-					login={context.profileData.loginData}
-					profile={context.profileData.profile}
-					key={context.profileData.profile.id}
+					login={context.loginData}
+					profile={context.profile}
+					key={context.profile.id}
 				/>
 			</div>
 		</div>
