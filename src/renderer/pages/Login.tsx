@@ -2,12 +2,15 @@ import { useState } from "react";
 import Loading from "renderer/components/Loading";
 import icon from "../../../assets/vario/nuovo-logo.svg";
 import styles from "../styles/Login.module.css";
+import Error from "renderer/components/Error";
 
 export default () => {
 	const [loading, setLoading] = useState(false);
+	const error = new URLSearchParams(window.location.search).get("error") ?? "";
 
 	return (
 		<>
+			{error && <Error error={error} />}
 			{loading && <Loading />}
 			<div className="Login">
 				<div className={styles.curve} />

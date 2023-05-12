@@ -122,8 +122,7 @@ const createWindow = async () => {
 };
 
 app.on("window-all-closed", () => {
-	// _Do not_ respect the OSX convention of having the application in memory even
-	// after all windows have been closed
+	// _Do not_ respect the OSX convention of having the application in memory even after all windows have been closed
 	app.quit();
 });
 app.on("second-instance", async (_, commandLine) => {
@@ -143,8 +142,19 @@ app.on("second-instance", async (_, commandLine) => {
 				codeVerifier: urlData.codeVerifier,
 				code,
 			}).catch(console.error);
-			await client.login();
-			win.loadURL(resolveHtmlPath("profiles")).catch(console.error);
+			const error = await client
+				.login()
+				.then(() => "")
+				.catch((err) => {
+					console.log(err);
+					if (typeof err === "string") return err;
+					if (err instanceof Error) return err.message;
+					return "Errore sconosciuto";
+				});
+
+			win
+				.loadURL(resolveHtmlPath(error ? `login?error=${error}` : "profiles"))
+				.catch(console.error);
 			win.webContents.clearHistory();
 		}
 	}
