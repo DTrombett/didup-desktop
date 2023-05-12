@@ -19,8 +19,12 @@ if (!app.requestSingleInstanceLock()) {
 	app.quit();
 	exit();
 }
+let res: () => void;
 let win: BrowserWindow | null = null;
 let urlData: LoginLink | undefined;
+const promise = new Promise<void>((_resolve) => {
+	res = _resolve;
+});
 const protocol = "it.argosoft.didup.famiglia.new";
 const debug = env.NODE_ENV === "development" || env.DEBUG_PROD === "true";
 const client = new Client({
@@ -87,10 +91,11 @@ const createWindow = async () => {
 		minHeight: 600,
 	});
 	new MenuBuilder(win).buildMenu();
-	win.loadURL(resolveHtmlPath("")).catch(console.error);
+	void win.loadURL(resolveHtmlPath("")).then(res);
 	win.maximize();
 	win.focus();
-	win.on("ready-to-show", () => {
+	win.on("ready-to-show", async () => {
+		await promise;
 		if (!win) throw new Error('"mainWindow" is not defined');
 		win.show();
 	});
