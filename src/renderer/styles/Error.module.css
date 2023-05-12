@@ -1,0 +1,21 @@
+.background {
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	display: flex;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(1, 1, 1, 0.9);
+	z-index: 1;
+}
+.error {
+	width: 15rem;
+	height: 7rem;
+	display: flex;
+	flex-direction: column;
+	background-color: rgba(196, 71, 71, 0.9);
+	border-radius: 10px;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}

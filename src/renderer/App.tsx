@@ -45,7 +45,9 @@ export default class App extends Component {
 
 	async componentDidMount() {
 		if (this.state.loginData) {
-			await window.electron.invokeClientMethod("login", false);
+			await window.electron
+				.invokeClientMethod("login", false)
+				.catch(window.electron.log);
 			this.setState({
 				dashboard: App.loadStorage<DashboardData>("dashboard"),
 			});
