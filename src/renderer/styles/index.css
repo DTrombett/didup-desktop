@@ -71,10 +71,6 @@
 	src: url("../../../assets/fonts/Poppins-ThinItalic.ttf");
 }
 
-* {
-	box-sizing: border-box;
-}
-
 #root {
 	--background-color: #202020;
 	--text-color: #ffffff;
