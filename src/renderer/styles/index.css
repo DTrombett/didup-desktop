@@ -80,7 +80,7 @@
 	position: relative;
 	color: var(--text-color);
 	height: 100vh;
-	background: var(--background-color);
+	background-color: var(--background-color);
 	font-family: sans-serif;
 	overflow: hidden;
 	display: flex;

@@ -73,33 +73,34 @@ const client = new Client({
 const createWindow = async () => {
 	if (debug) void installExtensions();
 	win = new BrowserWindow({
-		show: false,
 		autoHideMenuBar: true,
-		opacity: 0.99,
+		backgroundColor: "#FD202020",
 		icon: join(
 			app.isPackaged
 				? join(resourcesPath, "assets")
 				: join(__dirname, "../../assets"),
-			"icon.png"
+			"icon.ico"
 		),
+		minHeight: 600,
+		minWidth: 600,
+		opacity: 0.99,
+		show: false,
 		webPreferences: {
 			preload: app.isPackaged
 				? join(__dirname, "preload.js")
 				: join(__dirname, "../../.erb/dll/preload.js"),
 		},
-		minWidth: 600,
-		minHeight: 600,
 	});
-	new MenuBuilder(win).buildMenu();
 	void win.loadURL(resolveHtmlPath("")).then(res);
+	new MenuBuilder(win).buildMenu();
 	win.maximize();
-	win.focus();
-	win.on("ready-to-show", async () => {
+	win.once("ready-to-show", async () => {
 		await promise;
 		if (!win) throw new Error('"mainWindow" is not defined');
 		win.show();
+		win.focus();
 	});
-	win.on("closed", () => {
+	win.once("closed", () => {
 		win = null;
 	});
 	win.webContents.on("before-input-event", (event, input) => {
@@ -126,7 +127,7 @@ const createWindow = async () => {
 	});
 };
 
-app.on("window-all-closed", () => {
+app.once("window-all-closed", () => {
 	// _Do not_ respect the OSX convention of having the application in memory even after all windows have been closed
 	app.quit();
 });
