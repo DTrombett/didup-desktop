@@ -7,7 +7,7 @@ import type {
 	Token,
 } from "portaleargo-api";
 import { Component } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Provider } from "./Context";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
@@ -98,16 +98,16 @@ export default class App extends Component {
 					},
 				}}
 			>
-				<BrowserRouter>
+				<HashRouter>
 					<Routes>
-						<Route index Component={Splash} />
+						<Route index path="/" Component={Splash} />
 						<Route path="/login" Component={Login} />
 						<Route path="/profiles" Component={Profiles} />
 						<Route path="/dashboard" Component={Dashboard} />
 						<Route path="/profiledetails" Component={ProfileDetails} />
 						<Route path="*" element={<Navigate replace to="/" />} />
 					</Routes>
-				</BrowserRouter>
+				</HashRouter>
 			</Provider>
 		);
 	}

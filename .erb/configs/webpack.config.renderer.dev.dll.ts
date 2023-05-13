@@ -8,7 +8,6 @@ import { merge } from "webpack-merge";
 import { dependencies } from "../../package.json";
 import checkNodeEnv from "../scripts/check-node-env";
 import baseConfig from "./webpack.config.base";
-import rendererDev from "./webpack.config.renderer.dev";
 import webpackPaths from "./webpack.paths";
 
 checkNodeEnv("development");
@@ -29,7 +28,60 @@ const configuration: webpack.Configuration = {
 	/**
 	 * Use `module` from `webpack.config.renderer.dev.js`
 	 */
-	module: rendererDev.module,
+	module: {
+		rules: [
+			{
+				test: /\.s?(c|a)ss$/,
+				use: [
+					"style-loader",
+					{
+						loader: "css-loader",
+						options: {
+							modules: true,
+							sourceMap: true,
+							importLoaders: 1,
+						},
+					},
+					"sass-loader",
+				],
+				include: /\.module\.s?(c|a)ss$/,
+			},
+			{
+				test: /\.s?css$/,
+				use: ["style-loader", "css-loader", "sass-loader"],
+				exclude: /\.module\.s?(c|a)ss$/,
+			},
+			// Fonts
+			{
+				test: /\.(woff|woff2|eot|ttf|otf)$/i,
+				type: "asset/resource",
+			},
+			// Images
+			{
+				test: /\.(png|jpg|jpeg|gif)$/i,
+				type: "asset/resource",
+			},
+			// SVG
+			{
+				test: /\.svg$/,
+				use: [
+					{
+						loader: "@svgr/webpack",
+						options: {
+							prettier: false,
+							svgo: false,
+							svgoConfig: {
+								plugins: [{ removeViewBox: false }],
+							},
+							titleProp: true,
+							ref: true,
+						},
+					},
+					"file-loader",
+				],
+			},
+		],
+	},
 
 	entry: {
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
