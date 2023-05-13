@@ -74,7 +74,7 @@ const createWindow = async () => {
 	if (debug) void installExtensions();
 	win = new BrowserWindow({
 		autoHideMenuBar: true,
-		backgroundColor: "#FD202020",
+		backgroundColor: "#202020",
 		icon: join(
 			app.isPackaged
 				? join(resourcesPath, "assets")
@@ -90,8 +90,11 @@ const createWindow = async () => {
 				? join(__dirname, "preload.js")
 				: join(__dirname, "../../.erb/dll/preload.js"),
 		},
+		center: true,
+		darkTheme: true,
+		title: "DidUp Desktop",
 	});
-	void win.loadURL(resolveHtmlPath("")).then(res);
+	void win.loadURL(resolveHtmlPath("index.html#")).then(res);
 	new MenuBuilder(win).buildMenu();
 	win.maximize();
 	win.once("ready-to-show", async () => {
@@ -105,7 +108,7 @@ const createWindow = async () => {
 	});
 	win.webContents.on("before-input-event", (event, input) => {
 		if (!win) return;
-		if (input.alt) {
+		if (input.alt)
 			if (input.key === "ArrowLeft") {
 				if (new URL(win.webContents.getURL()).pathname !== "/login") {
 					win.webContents.goBack();
@@ -113,11 +116,6 @@ const createWindow = async () => {
 				}
 			} else if (input.key === "ArrowRight") {
 				win.webContents.goForward();
-				event.preventDefault();
-			}
-		} else if (input.control)
-			if (input.key === "r") {
-				win.loadURL(resolveHtmlPath("")).catch(console.error);
 				event.preventDefault();
 			}
 	});
@@ -133,6 +131,7 @@ app.once("window-all-closed", () => {
 });
 app.on("second-instance", async (_, commandLine) => {
 	if (!win) return;
+	console.log(commandLine);
 	if (win.isMinimized()) win.restore();
 	win.focus();
 	const url = new URL(commandLine.at(-1)!);
@@ -159,9 +158,10 @@ app.on("second-instance", async (_, commandLine) => {
 				});
 
 			win
-				.loadURL(resolveHtmlPath(error ? `login?error=${error}` : "profiles"))
+				.loadURL(
+					resolveHtmlPath(error ? `#/login?error=${error}` : "#/profiles")
+				)
 				.catch(console.error);
-			win.webContents.clearHistory();
 		}
 	}
 });
