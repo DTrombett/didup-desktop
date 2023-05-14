@@ -5,7 +5,7 @@ import Context from "renderer/Context";
 export default () => {
 	const context = useContext(Context);
 
-	if (context.dashboard === undefined) return <Navigate replace to="/login" />;
+	if (!context.dashboard) return <Navigate replace to="/login" />;
 	return (
 		<div>
 			<span>This is the Dashboard</span>

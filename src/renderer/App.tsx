@@ -16,27 +16,27 @@ import Profiles from "./pages/Profiles";
 import Splash from "./pages/Splash";
 import "./styles/index.css";
 
-export default class App extends Component {
-	static loadStorage<T>(key: string) {
-		const item = localStorage.getItem(key);
+const loadStorage = <T,>(key: string) => {
+	const item = localStorage.getItem(key);
 
-		if (item == null) return undefined;
-		try {
-			return JSON.parse(item) as T;
-		} catch (err) {
-			return undefined;
-		}
+	if (item == null) return undefined;
+	try {
+		return JSON.parse(item) as T;
+	} catch (err) {
+		return undefined;
 	}
+};
 
+export default class App extends Component {
 	state: {
 		dashboard?: DashboardData;
 		profile?: Profilo;
 		loginData?: LoginData;
 		token?: Token;
 	} = {
-		profile: App.loadStorage<Profilo>("profile"),
-		loginData: App.loadStorage<LoginData>("login"),
-		token: App.loadStorage<Token>("token"),
+		profile: loadStorage<Profilo>("profile"),
+		loginData: loadStorage<LoginData>("login"),
+		token: loadStorage<Token>("token"),
 	};
 
 	// constructor(props: Record<string, never>) {
@@ -49,7 +49,7 @@ export default class App extends Component {
 				.invokeClientMethod("login", false)
 				.catch(window.electron.log);
 			this.setState({
-				dashboard: App.loadStorage<DashboardData>("dashboard"),
+				dashboard: loadStorage<DashboardData>("dashboard"),
 			});
 		}
 	}
@@ -78,33 +78,33 @@ export default class App extends Component {
 					token: this.state.token,
 					loadDashboard: () => {
 						this.setState({
-							dashboard: App.loadStorage<DashboardData>("dashboard"),
+							dashboard: loadStorage<DashboardData>("dashboard"),
 						});
 					},
 					loadProfile: () => {
 						this.setState({
-							profile: App.loadStorage<Profilo>("profile"),
+							profile: loadStorage<Profilo>("profile"),
 						});
 					},
 					loadLoginData: () => {
 						this.setState({
-							loginData: App.loadStorage<LoginData>("login"),
+							loginData: loadStorage<LoginData>("login"),
 						});
 					},
 					loadToken: () => {
 						this.setState({
-							token: App.loadStorage<Token>("token"),
+							token: loadStorage<Token>("token"),
 						});
 					},
 				}}
 			>
 				<HashRouter>
 					<Routes>
-						<Route index path="/" Component={Splash} />
+						<Route path="/" index Component={Splash} />
 						<Route path="/login" Component={Login} />
 						<Route path="/profiles" Component={Profiles} />
 						<Route path="/dashboard" Component={Dashboard} />
-						<Route path="/profiledetails" Component={ProfileDetails} />
+						<Route path="/profileDetails" Component={ProfileDetails} />
 						<Route path="*" element={<Navigate replace to="/" />} />
 					</Routes>
 				</HashRouter>

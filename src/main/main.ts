@@ -1,4 +1,5 @@
 import { BrowserWindow, app, ipcMain, shell } from "electron";
+import install, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
 import { join, resolve } from "node:path";
 import {
 	argv,
@@ -11,10 +12,11 @@ import {
 import { URL } from "node:url";
 import type { LoginLink } from "portaleargo-api";
 import { Client, generateLoginLink, getToken } from "portaleargo-api";
-import installExtensions from "./utils/installExtensions";
 import MenuBuilder from "./utils/menu";
-import resolveHtmlPath from "./utils/resolveHtmlPath";
+import printError from "./utils/printError";
+import resolvePath from "./utils/resolvePath";
 
+Error.stackTraceLimit = Infinity;
 if (!app.requestSingleInstanceLock()) {
 	app.quit();
 	exit();
@@ -41,7 +43,7 @@ const client = new Client({
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 				return JSON.parse(text);
 			} catch (err) {
-				console.error(err);
+				printError(err);
 				return undefined;
 			}
 		},
@@ -71,7 +73,6 @@ const client = new Client({
 	},
 });
 const createWindow = async () => {
-	if (debug) void installExtensions();
 	win = new BrowserWindow({
 		autoHideMenuBar: true,
 		backgroundColor: "#202020",
@@ -81,8 +82,8 @@ const createWindow = async () => {
 				: join(__dirname, "../../assets"),
 			"icon.ico"
 		),
-		minHeight: 600,
-		minWidth: 600,
+		minHeight: 500,
+		minWidth: 500,
 		opacity: 0.99,
 		show: false,
 		webPreferences: {
@@ -90,11 +91,9 @@ const createWindow = async () => {
 				? join(__dirname, "preload.js")
 				: join(__dirname, "../../.erb/dll/preload.js"),
 		},
-		center: true,
-		darkTheme: true,
 		title: "DidUp Desktop",
 	});
-	void win.loadURL(resolveHtmlPath("index.html#")).then(res);
+	void win.loadURL(resolvePath("")).then(res);
 	new MenuBuilder(win).buildMenu();
 	win.maximize();
 	win.once("ready-to-show", async () => {
@@ -106,22 +105,17 @@ const createWindow = async () => {
 	win.once("closed", () => {
 		win = null;
 	});
-	win.webContents.on("before-input-event", (event, input) => {
-		if (!win) return;
-		if (input.alt)
-			if (input.key === "ArrowLeft") {
-				if (new URL(win.webContents.getURL()).pathname !== "/login") {
-					win.webContents.goBack();
-					event.preventDefault();
-				}
-			} else if (input.key === "ArrowRight") {
-				win.webContents.goForward();
-				event.preventDefault();
-			}
-	});
 	win.webContents.setWindowOpenHandler(({ url }) => {
-		shell.openExternal(url).catch(console.error);
+		shell.openExternal(url).catch(printError);
 		return { action: "deny" };
+	});
+	win.webContents.once("dom-ready", () => {
+		if (debug) {
+			install([REACT_DEVELOPER_TOOLS], { forceDownload: true }).catch(
+				printError
+			);
+			win?.webContents.openDevTools();
+		}
 	});
 };
 
@@ -146,7 +140,7 @@ app.on("second-instance", async (_, commandLine) => {
 			await getToken(client, {
 				codeVerifier: urlData.codeVerifier,
 				code,
-			}).catch(console.error);
+			}).catch(printError);
 			const error = await client
 				.login()
 				.then(() => "")
@@ -158,10 +152,8 @@ app.on("second-instance", async (_, commandLine) => {
 				});
 
 			win
-				.loadURL(
-					resolveHtmlPath(error ? `#/login?error=${error}` : "#/profiles")
-				)
-				.catch(console.error);
+				.loadURL(resolvePath(error ? `login?error=${error}` : "profiles"))
+				.catch(printError);
 		}
 	}
 });
@@ -171,7 +163,7 @@ ipcMain.handle("client", (_event, ...keys: (keyof Client)[]) =>
 );
 ipcMain.on("login", () => {
 	urlData = generateLoginLink();
-	shell.openExternal(urlData.url).catch(console.error);
+	shell.openExternal(urlData.url).catch(printError);
 });
 ipcMain.on("log", (_event, ...args) => {
 	console.log(...args);

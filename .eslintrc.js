@@ -102,6 +102,7 @@ module.exports = {
 		"no-octal-escape": "warn",
 		"no-process-exit": "off",
 		"no-promise-executor-return": "warn",
+		"no-param-reassign": "off",
 		"no-proto": "warn",
 		"no-self-compare": "warn",
 		"no-sequences": "warn",

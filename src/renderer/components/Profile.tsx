@@ -33,7 +33,7 @@ export default ({
 				</div>
 			</div>
 			{state && (
-				<Link className={`${styles.options} button`} to="/profiledetails">
+				<Link className={`${styles.options} button`} to="/profileDetails">
 					<img src={options} alt="options" className={styles.optionsImage} />
 				</Link>
 			)}
