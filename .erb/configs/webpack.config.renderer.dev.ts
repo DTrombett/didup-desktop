@@ -1,7 +1,6 @@
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
 import chalk from "chalk";
 import HtmlWebpackPlugin from "html-webpack-plugin";
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import { execSync, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -83,12 +82,7 @@ const configuration: Configuration = {
 			},
 			{
 				test: /\.s?(c|a)ss$/,
-				use: [
-					MiniCssExtractPlugin.loader,
-					"style-loader",
-					"css-loader",
-					"sass-loader",
-				],
+				use: ["style-loader", "css-loader", "sass-loader"],
 				exclude: /\.module\.s?(c|a)ss$/,
 			},
 			// Fonts
@@ -132,7 +126,6 @@ const configuration: Configuration = {
 						sourceType: "var",
 					}),
 			  ]),
-		new MiniCssExtractPlugin(),
 		new NoEmitOnErrorsPlugin(),
 
 		/**

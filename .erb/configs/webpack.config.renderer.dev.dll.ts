@@ -51,7 +51,6 @@ const configuration: Configuration = {
 			{
 				test: /\.s?(c|a)ss$/,
 				use: [
-					MiniCssExtractPlugin.loader,
 					"style-loader",
 					"css-loader",
 					"sass-loader",
@@ -109,7 +108,6 @@ const configuration: Configuration = {
 			path: join(dist, "[name].json"),
 			name: "[name]",
 		}),
-		new MiniCssExtractPlugin(),
 
 		/**
 		 * Create global constants which can be configured at compile time.

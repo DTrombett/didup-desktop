@@ -109,6 +109,11 @@ const createWindow = async () => {
 		shell.openExternal(url).catch(printError);
 		return { action: "deny" };
 	});
+	win.webContents.on("will-navigate", (event, input) => {
+		if (event.type === "hashchange") return;
+		if (!new URL(input).href.startsWith(resolvePath("")))
+			event.preventDefault();
+	});
 	win.webContents.once("dom-ready", () => {
 		if (debug) {
 			install([REACT_DEVELOPER_TOOLS], { forceDownload: true }).catch(
@@ -132,11 +137,11 @@ app.once("window-all-closed", () => {
 });
 app.on("second-instance", async (_, commandLine) => {
 	if (!win) return;
-	console.log(commandLine);
 	if (win.isMinimized()) win.restore();
 	win.focus();
 	const url = new URL(commandLine.at(-1)!);
 
+	// TODO: check why the page doesn't change after a successful login
 	if (
 		url.hostname === "login-callback" &&
 		url.searchParams.get("state") === urlData?.state
@@ -152,7 +157,7 @@ app.on("second-instance", async (_, commandLine) => {
 				.login()
 				.then(() => "")
 				.catch((err) => {
-					console.log(err);
+					printError(err);
 					if (typeof err === "string") return err;
 					if (err instanceof Error) return err.message;
 					return "Errore sconosciuto";
