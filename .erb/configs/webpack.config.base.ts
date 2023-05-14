@@ -3,11 +3,12 @@
  */
 
 import TsconfigPathsPlugins from "tsconfig-paths-webpack-plugin";
-import webpack from "webpack";
+import type { Configuration } from "webpack";
+import { EnvironmentPlugin } from "webpack";
 import { dependencies as externals } from "../../release/app/package.json";
 import webpackPaths from "./webpack.paths";
 
-const configuration: webpack.Configuration = {
+const configuration: Configuration = {
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
 	externals: [...Object.keys(externals || {})],
 
@@ -51,7 +52,7 @@ const configuration: webpack.Configuration = {
 	},
 
 	plugins: [
-		new webpack.EnvironmentPlugin({
+		new EnvironmentPlugin({
 			NODE_ENV: "production",
 		}),
 	],

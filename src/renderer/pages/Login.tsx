@@ -9,7 +9,7 @@ import { Navigate } from "react-router-dom";
 export default () => {
 	const context = useContext(Context);
 
-	if (context.dashboard) return <Navigate replace to="/dashboard" />;
+	if (context.loginData) return <Navigate replace to="/" />;
 	const [loading, setLoading] = useState(false);
 	const error = new URLSearchParams(window.location.search).get("error") ?? "";
 
