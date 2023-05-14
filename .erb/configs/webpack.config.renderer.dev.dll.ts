@@ -2,6 +2,7 @@
  * Builds the DLL for development electron renderer process
  */
 
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import { join } from "node:path";
 import type { Configuration } from "webpack";
 import { DllPlugin, EnvironmentPlugin, LoaderOptionsPlugin } from "webpack";
@@ -48,8 +49,13 @@ const configuration: Configuration = {
 				include: /\.module\.s?(c|a)ss$/,
 			},
 			{
-				test: /\.s?css$/,
-				use: ["style-loader", "css-loader", "sass-loader"],
+				test: /\.s?(c|a)ss$/,
+				use: [
+					MiniCssExtractPlugin.loader,
+					"style-loader",
+					"css-loader",
+					"sass-loader",
+				],
 				exclude: /\.module\.s?(c|a)ss$/,
 			},
 			// Fonts
@@ -103,6 +109,7 @@ const configuration: Configuration = {
 			path: join(dist, "[name].json"),
 			name: "[name]",
 		}),
+		new MiniCssExtractPlugin(),
 
 		/**
 		 * Create global constants which can be configured at compile time.
