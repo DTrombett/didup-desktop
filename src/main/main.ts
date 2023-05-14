@@ -1,7 +1,7 @@
 import { BrowserWindow, app, ipcMain, shell } from "electron";
 import install, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
 import { join, resolve } from "node:path";
-import {
+import process, {
 	argv,
 	defaultApp,
 	env,
@@ -118,6 +118,13 @@ const createWindow = async () => {
 		}
 	});
 };
+const listener = (err: Error): void => {
+	printError(err);
+};
+
+process.on("uncaughtException", listener);
+process.on("unhandledRejection", listener);
+process.on("warning", listener);
 
 app.once("window-all-closed", () => {
 	// _Do not_ respect the OSX convention of having the application in memory even after all windows have been closed

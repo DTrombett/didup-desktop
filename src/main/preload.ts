@@ -3,7 +3,6 @@ import type { Client } from "portaleargo-api";
 
 type CallbackArgs<A = [], B = []> = [A, B];
 type Args = {
-	ping: CallbackArgs<[message: string], [message: string]>;
 	login: CallbackArgs;
 	write: CallbackArgs<
 		[nonce: number],
@@ -11,7 +10,7 @@ type Args = {
 	>;
 };
 
-const electron = {
+const app = {
 	send<T extends keyof Args>(channel: T, ...args: Args[T][0]) {
 		ipcRenderer.send(channel, ...args);
 	},
@@ -24,12 +23,6 @@ const electron = {
 		ipcRenderer.once(channel, (_event, ...args: any) => {
 			func(...args);
 		});
-	},
-	removeAllListeners<T extends keyof Args>(channel: T) {
-		ipcRenderer.removeAllListeners(channel);
-	},
-	getClient<T extends keyof Client>(...keys: T[] & [T]) {
-		return ipcRenderer.invoke("client", ...keys) as Promise<Pick<Client, T>>;
 	},
 	log(this: void, ...args: unknown[]) {
 		ipcRenderer.send("log", ...args);
@@ -53,6 +46,6 @@ const electron = {
 	},
 };
 
-contextBridge.exposeInMainWorld("electron", electron);
+contextBridge.exposeInMainWorld("app", app);
 
-export type ElectronHandler = typeof electron;
+export type ElectronHandler = typeof app;

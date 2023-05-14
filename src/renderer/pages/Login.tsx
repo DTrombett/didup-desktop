@@ -38,7 +38,7 @@ export default () => {
 					disabled={loading}
 					onClick={() => {
 						setLoading(true);
-						window.electron.send("login");
+						window.app.send("login");
 					}}
 				>
 					+
