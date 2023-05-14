@@ -1,15 +1,15 @@
 import chalk from "chalk";
 import { execSync } from "node:child_process";
-import fs from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { exit } from "node:process";
 import { dependencies } from "../../package.json";
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
 if (dependencies) {
 	const dependenciesKeys = Object.keys(dependencies);
-	const nativeDeps = fs
-		.readdirSync("node_modules")
-		.filter((folder) => fs.existsSync(`node_modules/${folder}/binding.gyp`));
+	const nativeDeps = readdirSync("node_modules").filter((folder) =>
+		existsSync(`node_modules/${folder}/binding.gyp`)
+	);
 	if (nativeDeps.length === 0) exit(0);
 
 	try {

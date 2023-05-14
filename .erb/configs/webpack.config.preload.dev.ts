@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { env } from "node:process";
-import webpack from "webpack";
+import type { Configuration } from "webpack";
+import { EnvironmentPlugin, LoaderOptionsPlugin } from "webpack";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import { merge } from "webpack-merge";
 import checkNodeEnv from "../scripts/check-node-env";
@@ -11,7 +12,7 @@ import webpackPaths from "./webpack.paths";
 // at the dev webpack config is not accidentally run in a production environment
 if (env.NODE_ENV === "production") checkNodeEnv("development");
 
-const configuration: webpack.Configuration = {
+const configuration: Configuration = {
 	devtool: "inline-source-map",
 
 	mode: "development",
@@ -45,11 +46,11 @@ const configuration: webpack.Configuration = {
 		 * By default, use 'development' as NODE_ENV. This can be overriden with
 		 * 'staging', for example, by changing the ENV variables in the npm scripts
 		 */
-		new webpack.EnvironmentPlugin({
+		new EnvironmentPlugin({
 			NODE_ENV: "development",
 		}),
 
-		new webpack.LoaderOptionsPlugin({
+		new LoaderOptionsPlugin({
 			debug: true,
 		}),
 	],
