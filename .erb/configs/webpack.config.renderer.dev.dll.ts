@@ -2,8 +2,9 @@
  * Builds the DLL for development electron renderer process
  */
 
-import path from "node:path";
-import webpack from "webpack";
+import { join } from "node:path";
+import type { Configuration } from "webpack";
+import { DllPlugin, EnvironmentPlugin, LoaderOptionsPlugin } from "webpack";
 import { merge } from "webpack-merge";
 import { dependencies } from "../../package.json";
 import checkNodeEnv from "../scripts/check-node-env";
@@ -14,7 +15,7 @@ checkNodeEnv("development");
 
 const dist = webpackPaths.dllPath;
 
-const configuration: webpack.Configuration = {
+const configuration: Configuration = {
 	context: webpackPaths.rootPath,
 
 	devtool: "eval",
@@ -98,8 +99,8 @@ const configuration: webpack.Configuration = {
 	},
 
 	plugins: [
-		new webpack.DllPlugin({
-			path: path.join(dist, "[name].json"),
+		new DllPlugin({
+			path: join(dist, "[name].json"),
 			name: "[name]",
 		}),
 
@@ -112,11 +113,11 @@ const configuration: webpack.Configuration = {
 		 * NODE_ENV should be production so that modules do not perform certain
 		 * development checks
 		 */
-		new webpack.EnvironmentPlugin({
+		new EnvironmentPlugin({
 			NODE_ENV: "development",
 		}),
 
-		new webpack.LoaderOptionsPlugin({
+		new LoaderOptionsPlugin({
 			debug: true,
 			options: {
 				context: webpackPaths.srcPath,

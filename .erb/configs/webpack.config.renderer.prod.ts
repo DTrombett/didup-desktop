@@ -5,10 +5,11 @@
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import path from "node:path";
+import { join } from "node:path";
 import { env } from "node:process";
 import TerserPlugin from "terser-webpack-plugin";
-import webpack from "webpack";
+import type { Configuration } from "webpack";
+import { DefinePlugin, EnvironmentPlugin } from "webpack";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import { merge } from "webpack-merge";
 import checkNodeEnv from "../scripts/check-node-env";
@@ -19,14 +20,14 @@ import webpackPaths from "./webpack.paths";
 checkNodeEnv("production");
 deleteSourceMaps();
 
-const configuration: webpack.Configuration = {
+const configuration: Configuration = {
 	devtool: "source-map",
 
 	mode: "production",
 
 	target: ["web", "electron-renderer"],
 
-	entry: [path.join(webpackPaths.srcRendererPath, "index.tsx")],
+	entry: [join(webpackPaths.srcRendererPath, "index.tsx")],
 
 	output: {
 		path: webpackPaths.distRendererPath,
@@ -112,7 +113,7 @@ const configuration: webpack.Configuration = {
 		 * NODE_ENV should be production so that modules do not perform certain
 		 * development checks
 		 */
-		new webpack.EnvironmentPlugin({
+		new EnvironmentPlugin({
 			NODE_ENV: "production",
 			DEBUG_PROD: false,
 		}),
@@ -128,7 +129,7 @@ const configuration: webpack.Configuration = {
 
 		new HtmlWebpackPlugin({
 			filename: "index.html",
-			template: path.join(webpackPaths.srcRendererPath, "index.ejs"),
+			template: join(webpackPaths.srcRendererPath, "index.ejs"),
 			minify: {
 				collapseWhitespace: true,
 				removeAttributeQuotes: true,
@@ -138,7 +139,7 @@ const configuration: webpack.Configuration = {
 			isDevelopment: env.NODE_ENV !== "production",
 		}),
 
-		new webpack.DefinePlugin({
+		new DefinePlugin({
 			"process.type": '"renderer"',
 		}),
 	],

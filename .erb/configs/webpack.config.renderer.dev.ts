@@ -2,10 +2,16 @@ import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
 import chalk from "chalk";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { execSync, spawn } from "node:child_process";
-import fs from "node:fs";
-import path from "node:path";
+import { existsSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { env, exit } from "node:process";
-import webpack from "webpack";
+import type { Configuration } from "webpack";
+import {
+	DllReferencePlugin,
+	EnvironmentPlugin,
+	LoaderOptionsPlugin,
+	NoEmitOnErrorsPlugin,
+} from "webpack";
 import "webpack-dev-server";
 import { merge } from "webpack-merge";
 import checkNodeEnv from "../scripts/check-node-env";
@@ -17,7 +23,7 @@ import webpackPaths from "./webpack.paths";
 if (env.NODE_ENV === "production") checkNodeEnv("development");
 
 const port = env.PORT ?? 1212;
-const manifest = path.resolve(webpackPaths.dllPath, "renderer.json");
+const manifest = resolve(webpackPaths.dllPath, "renderer.json");
 const skipDLLs =
 	__filename.includes("webpack.config.renderer.dev.dll") ||
 	__filename.includes("webpack.config.eslint");
@@ -25,10 +31,7 @@ const skipDLLs =
 /**
  * Warn if the DLL is not built
  */
-if (
-	!skipDLLs &&
-	!(fs.existsSync(webpackPaths.dllPath) && fs.existsSync(manifest))
-) {
+if (!skipDLLs && !(existsSync(webpackPaths.dllPath) && existsSync(manifest))) {
 	console.log(
 		chalk.black.bgYellow.bold(
 			'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"'
@@ -37,7 +40,7 @@ if (
 	execSync("npm run postinstall");
 }
 
-const configuration: webpack.Configuration = {
+const configuration: Configuration = {
 	devtool: "inline-source-map",
 
 	mode: "development",
@@ -47,7 +50,7 @@ const configuration: webpack.Configuration = {
 	entry: [
 		`webpack-dev-server/client?http://localhost:${port}/dist`,
 		"webpack/hot/only-dev-server",
-		path.join(webpackPaths.srcRendererPath, "index.tsx"),
+		join(webpackPaths.srcRendererPath, "index.tsx"),
 	],
 
 	output: {
@@ -117,14 +120,14 @@ const configuration: webpack.Configuration = {
 		...(skipDLLs
 			? []
 			: [
-					new webpack.DllReferencePlugin({
+					new DllReferencePlugin({
 						context: webpackPaths.dllPath,
 						manifest: require(manifest),
 						sourceType: "var",
 					}),
 			  ]),
 
-		new webpack.NoEmitOnErrorsPlugin(),
+		new NoEmitOnErrorsPlugin(),
 
 		/**
 		 * Create global constants which can be configured at compile time.
@@ -138,19 +141,19 @@ const configuration: webpack.Configuration = {
 		 * By default, use 'development' as NODE_ENV. This can be overriden with
 		 * 'staging', for example, by changing the ENV variables in the npm scripts
 		 */
-		new webpack.EnvironmentPlugin({
+		new EnvironmentPlugin({
 			NODE_ENV: "development",
 		}),
 
-		new webpack.LoaderOptionsPlugin({
+		new LoaderOptionsPlugin({
 			debug: true,
 		}),
 
 		new ReactRefreshWebpackPlugin(),
 
 		new HtmlWebpackPlugin({
-			filename: path.join("index.html"),
-			template: path.join(webpackPaths.srcRendererPath, "index.ejs"),
+			filename: join("index.html"),
+			template: join(webpackPaths.srcRendererPath, "index.ejs"),
 			minify: {
 				collapseWhitespace: true,
 				removeAttributeQuotes: true,
