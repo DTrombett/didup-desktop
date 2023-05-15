@@ -29,6 +29,11 @@ const promise = new Promise<void>((_resolve) => {
 });
 const protocol = "it.argosoft.didup.famiglia.new";
 const debug = env.NODE_ENV === "development" || env.DEBUG_PROD === "true";
+const mainUrl = new URL(
+	app.isPackaged
+		? `file://${resolve(__dirname, "../renderer/index.html")}`
+		: `http://localhost:${env.PORT ?? 1212}/index.html`
+);
 const client = new Client({
 	debug,
 	dataProvider: {
@@ -68,7 +73,22 @@ const client = new Client({
 		},
 		reset: async () => {
 			if (!win) return undefined;
-			return win.webContents.executeJavaScript("localStorage.clear()");
+			const nonce = Math.random();
+
+			win.webContents.send("reset", nonce);
+			return new Promise((_resolve) => {
+				const listener: (
+					event: Electron.IpcMainEvent,
+					...args: any[]
+				) => void = (_event, n) => {
+					if (n === nonce) {
+						ipcMain.removeListener("reset", listener);
+						_resolve();
+					}
+				};
+
+				ipcMain.on("reset", listener);
+			});
 		},
 	},
 });
@@ -93,14 +113,13 @@ const createWindow = async () => {
 		},
 		title: "DidUp Desktop",
 	});
-	void win.loadURL(resolvePath("")).then(res);
+	void win.loadURL(resolvePath()).then(res);
 	new MenuBuilder(win).buildMenu();
 	win.maximize();
 	win.once("ready-to-show", async () => {
 		await promise;
 		if (!win) throw new Error('"mainWindow" is not defined');
 		win.show();
-		win.focus();
 	});
 	win.once("closed", () => {
 		win = null;
@@ -111,7 +130,11 @@ const createWindow = async () => {
 	});
 	win.webContents.on("will-navigate", (event, input) => {
 		if (event.type === "hashchange") return;
-		if (!new URL(input).href.startsWith(resolvePath("")))
+		const url = new URL(input);
+
+		// TODO: check production
+		// TODO: find a way not to replay the first animation of the login page
+		if (url.origin !== mainUrl.origin || url.pathname !== mainUrl.pathname)
 			event.preventDefault();
 	});
 	win.webContents.once("dom-ready", () => {
@@ -141,7 +164,6 @@ app.on("second-instance", async (_, commandLine) => {
 	win.focus();
 	const url = new URL(commandLine.at(-1)!);
 
-	// TODO: check why the page doesn't change after a successful login
 	if (
 		url.hostname === "login-callback" &&
 		url.searchParams.get("state") === urlData?.state
@@ -164,7 +186,13 @@ app.on("second-instance", async (_, commandLine) => {
 				});
 
 			win
-				.loadURL(resolvePath(error ? `login?error=${error}` : "profiles"))
+				.loadURL(
+					resolvePath(
+						error
+							? { hash: "/login", search: `error=${error}` }
+							: { hash: "/profiles", search: "first" }
+					)
+				)
 				.catch(printError);
 		}
 	}

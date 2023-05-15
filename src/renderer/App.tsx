@@ -31,25 +31,59 @@ export default class App extends Component {
 	state: {
 		dashboard?: DashboardData;
 		profile?: Profilo;
-		loginData?: LoginData;
+		login?: LoginData;
 		token?: Token;
 	} = {
 		profile: loadStorage<Profilo>("profile"),
-		loginData: loadStorage<LoginData>("login"),
+		login: loadStorage<LoginData>("login"),
 		token: loadStorage<Token>("token"),
 	};
 
-	// constructor(props: Record<string, never>) {
-	// 	super(props);
-	// }
-
 	async componentDidMount() {
-		if (this.state.loginData) {
+		window.app.on("write", (name, value, nonce) => {
+			localStorage.setItem(name, value);
+			try {
+				this.setState({
+					[name]: JSON.parse(value),
+				});
+			} catch (err) {
+				window.app.log(err);
+			}
+			window.app.send("write", nonce);
+		});
+		window.app.on("reset", (nonce) => {
+			localStorage.clear();
+			const state = { ...this.state };
+
+			Object.keys(this.state).forEach((key) => {
+				state[key as keyof typeof state] = undefined;
+			});
+			this.setState(state);
+			window.app.send("reset", nonce);
+		});
+		if (this.state.login) {
 			await window.app.invokeClientMethod("login", false).catch(window.app.log);
 			this.setState({
 				dashboard: loadStorage<DashboardData>("dashboard"),
 			});
 		}
+	}
+
+	shouldComponentUpdate(
+		_nextProps: unknown,
+		nextState: Readonly<App["state"]>
+	) {
+		return (
+			nextState.dashboard !== this.state.dashboard ||
+			nextState.login !== this.state.login ||
+			nextState.profile !== this.state.profile ||
+			nextState.token !== this.state.token
+		);
+	}
+
+	componentWillUnmount() {
+		window.app.removeAllListeners("write");
+		window.app.removeAllListeners("reset");
 	}
 
 	setState<K extends keyof this["state"]>(
@@ -61,8 +95,8 @@ export default class App extends Component {
 					props: Readonly<this["state"]>
 			  ) => Pick<this["state"], K> | this["state"] | null)
 			| null,
-		callback?: (() => void) | undefined
-	): void {
+		callback?: () => void
+	) {
 		super.setState(state, callback);
 	}
 
@@ -70,7 +104,7 @@ export default class App extends Component {
 		return (
 			<Provider
 				value={{
-					loginData: this.state.loginData,
+					loginData: this.state.login,
 					profile: this.state.profile,
 					dashboard: this.state.dashboard,
 					token: this.state.token,
@@ -86,7 +120,7 @@ export default class App extends Component {
 					},
 					loadLoginData: () => {
 						this.setState({
-							loginData: loadStorage<LoginData>("login"),
+							login: loadStorage<LoginData>("login"),
 						});
 					},
 					loadToken: () => {

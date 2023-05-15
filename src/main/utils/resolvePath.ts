@@ -3,11 +3,20 @@ import { resolve } from "node:path";
 import { env } from "node:process";
 import { URL } from "node:url";
 
-export default (hash: string) => {
-	if (app.isPackaged)
-		return `file://${resolve(__dirname, "../renderer/index.html#/", hash)}`;
-	const url = new URL(`http://localhost:${env.PORT ?? 1212}/index.html`);
+export default ({
+	hash = "/",
+	search = "",
+}: {
+	hash?: string;
+	search?: string;
+} = {}) => {
+	const url = new URL(
+		app.isPackaged
+			? `file://${resolve(__dirname, "../renderer/index.html")}`
+			: `http://localhost:${env.PORT ?? 1212}/index.html`
+	);
 
-	url.hash = `#/${hash}`;
+	url.search = search;
+	url.hash = hash;
 	return url.href;
 };
