@@ -8,7 +8,10 @@ export default () => {
 	const context = useContext(Context);
 
 	if (!context.loginData || !context.profile)
-		return <Navigate replace to="/login" />;
+		return <Navigate replace to="/" />;
+	const first =
+		new URLSearchParams(window.location.search).get("first") != null;
+
 	return (
 		<div className="Profiles">
 			<span className={styles.header}>Scelta profilo</span>
@@ -20,6 +23,12 @@ export default () => {
 					key={context.profile.id}
 				/>
 			</div>
+			{first && (
+				<div className={styles.first}>
+					Accesso effettuato con successo! Ora puoi chiudere la finestra del
+					browser
+				</div>
+			)}
 		</div>
 	);
 };

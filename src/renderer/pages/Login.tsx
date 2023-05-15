@@ -9,14 +9,14 @@ import { Navigate } from "react-router-dom";
 export default () => {
 	const context = useContext(Context);
 
-	if (context.loginData) return <Navigate replace to="/" />;
+	if (context.dashboard) return <Navigate replace to="/" />;
 	const [loading, setLoading] = useState(false);
 	const error = new URLSearchParams(window.location.search).get("error") ?? "";
 
 	return (
 		<>
 			{error && <Error error={error} />}
-			{loading && <Loading />}
+			{loading && <Loading text="Prosegui il login nel browser..." />}
 			<div className="Login">
 				<div className={styles.curve} />
 				<img alt="icon" src={icon} className={styles.icon} />

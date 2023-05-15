@@ -10,3 +10,43 @@
 	width: 80%;
 	height: 100%;
 }
+
+.first {
+	background-color: #4752c4;
+	width: 90%;
+	border-radius: 5px;
+	bottom: 1rem;
+	padding: 1rem;
+	text-align: center;
+	position: absolute;
+	animation-duration: 1s;
+	animation-delay: 9.5s;
+	animation-name: vanish;
+	animation-fill-mode: forwards;
+}
+
+@keyframes vanish {
+	100% {
+		opacity: 0;
+	}
+}
+
+.first::after {
+	content: "";
+	position: absolute;
+	border-radius: 5px;
+	left: 0;
+	bottom: 0;
+	height: 8px;
+	background-color: #272f84;
+	animation: progress-bar 10s ease-in-out forwards;
+}
+
+@keyframes progress-bar {
+	from {
+		width: 0%;
+	}
+	to {
+		width: 100%;
+	}
+}

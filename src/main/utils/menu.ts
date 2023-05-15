@@ -246,8 +246,6 @@ export default class MenuBuilder {
 					{
 						label: "&Strumenti per sviluppatori",
 						accelerator: "Ctrl+Shift+I",
-						visible:
-							env.NODE_ENV === "development" || env.DEBUG_PROD === "true",
 						role: "toggleDevTools",
 					},
 					{

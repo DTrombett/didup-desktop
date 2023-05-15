@@ -8,8 +8,8 @@ import styles from "../styles/ProfileDetails.module.css";
 export default () => {
 	const context = useContext(Context);
 
-	if (!context.profile || !context.loginData)
-		return <Navigate replace to="/login" />;
+	if (!context.loginData || !context.profile)
+		return <Navigate replace to="/" />;
 	return (
 		<div className="ProfileDetails">
 			<div className={styles.header}>

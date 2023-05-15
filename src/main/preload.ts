@@ -1,13 +1,14 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type { Client } from "portaleargo-api";
 
-type CallbackArgs<A = [], B = []> = [A, B];
+type CallbackArgs<A = [], B = A> = [A, B];
 type Args = {
 	login: CallbackArgs;
 	write: CallbackArgs<
 		[nonce: number],
 		[name: string, value: string, nonce: number]
 	>;
+	reset: CallbackArgs<[nonce: number]>;
 };
 
 const app = {
@@ -23,6 +24,9 @@ const app = {
 		ipcRenderer.once(channel, (_event, ...args: any) => {
 			func(...args);
 		});
+	},
+	removeAllListeners<T extends keyof Args>(channel: T) {
+		ipcRenderer.removeAllListeners(channel);
 	},
 	log(this: void, ...args: unknown[]) {
 		ipcRenderer.send("log", ...args);
