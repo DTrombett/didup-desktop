@@ -1,8 +1,8 @@
 import type { BrowserWindow, MenuItemConstructorOptions } from "electron";
 import { Menu, app, shell } from "electron";
 import { env, platform } from "node:process";
-import resolveHtmlPath from "./resolvePath";
 import printError from "./printError";
+import resolveHtmlPath from "./resolvePath";
 
 type DarwinMenuItemConstructorOptions = MenuItemConstructorOptions & {
 	selector?: string;
@@ -190,7 +190,7 @@ export default class MenuBuilder {
 						accelerator: "Alt+D",
 						click: () => {
 							this.window
-								.loadURL(resolveHtmlPath("dashboard"))
+								.loadURL(resolveHtmlPath({ hash: "/dashboard" }))
 								.catch(printError);
 						},
 						id: "dashboard",
@@ -200,7 +200,7 @@ export default class MenuBuilder {
 						accelerator: "Alt+P",
 						click: () => {
 							this.window
-								.loadURL(resolveHtmlPath("profiles"))
+								.loadURL(resolveHtmlPath({ hash: "/profiles" }))
 								.catch(printError);
 						},
 						id: "profile",

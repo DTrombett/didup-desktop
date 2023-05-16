@@ -31,23 +31,27 @@
 
 .studentName {
 	margin-bottom: 0.5rem;
+	user-select: text;
 }
 
 .className {
 	font-size: 15px;
 	color: var(--link-color);
 	margin-bottom: 0.1rem;
+	user-select: text;
 }
 
 .year {
 	color: grey;
 	font-size: 15px;
+	user-select: text;
 }
 
 .schoolName {
 	font-family: "Poppins Regular";
 	margin-top: 1rem;
 	margin-bottom: 2rem;
+	user-select: text;
 }
 
 .options {
@@ -102,4 +106,5 @@
 	color: var(--red-color);
 	text-transform: uppercase;
 	margin-top: 2rem;
+	user-select: text;
 }
