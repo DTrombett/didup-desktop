@@ -9,12 +9,12 @@ const Context = createContext<{
 	token?: Token;
 	loadDashboard: () => void;
 	loadProfile: () => void;
-	loadLoginData: () => void;
+	loadLogin: () => void;
 	loadToken: () => void;
 }>({
 	loadDashboard: async () => {},
 	loadProfile: async () => {},
-	loadLoginData: async () => {},
+	loadLogin: async () => {},
 	loadToken: async () => {},
 });
 

@@ -132,8 +132,6 @@ const createWindow = async () => {
 		if (event.type === "hashchange") return;
 		const url = new URL(input);
 
-		// TODO: check production
-		// TODO: find a way not to replay the first animation of the login page
 		if (url.origin !== mainUrl.origin || url.pathname !== mainUrl.pathname)
 			event.preventDefault();
 	});

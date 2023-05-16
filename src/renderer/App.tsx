@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/member-ordering */
 import "bulma/css/bulma.min.css";
 import type {
 	Dashboard as DashboardData,
@@ -6,8 +5,8 @@ import type {
 	Profilo,
 	Token,
 } from "portaleargo-api";
-import { Component } from "react";
-import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate, RouterProvider, createHashRouter } from "react-router-dom";
 import { Provider } from "./Context";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
@@ -27,25 +26,52 @@ const loadStorage = <T,>(key: string) => {
 	}
 };
 
-export default class App extends Component {
-	state: {
-		dashboard?: DashboardData;
-		profile?: Profilo;
-		login?: LoginData;
-		token?: Token;
-	} = {
-		profile: loadStorage<Profilo>("profile"),
-		login: loadStorage<LoginData>("login"),
-		token: loadStorage<Token>("token"),
-	};
+// TODO: Try using loaders
+export default () => {
+	const [dashboard, setDashboard] = useState<DashboardData>();
+	const [profile, setProfile] = useState(() => loadStorage<Profilo>("profile"));
+	const [loginData, setLogin] = useState(() => loadStorage<LoginData>("login"));
+	const [token, setToken] = useState(() => loadStorage<Token>("token"));
+	const router = createHashRouter([
+		{
+			path: "/",
+			index: true,
+			Component: Splash,
+		},
+		{
+			path: "/login",
+			Component: Login,
+		},
+		{
+			path: "/profiles",
+			Component: Profiles,
+		},
+		{
+			path: "/dashboard",
+			Component: Dashboard,
+		},
+		{
+			path: "/profileDetails",
+			Component: ProfileDetails,
+		},
+		{
+			path: "*",
+			element: <Navigate replace to="/" />,
+		},
+	]);
 
-	async componentDidMount() {
+	useEffect(() => {
+		const states = {
+			dashboard: setDashboard,
+			profile: setProfile,
+			login: setLogin,
+			token: setToken,
+		};
+
 		window.app.on("write", (name, value, nonce) => {
 			localStorage.setItem(name, value);
 			try {
-				this.setState({
-					[name]: JSON.parse(value),
-				});
+				states[name as keyof typeof states](JSON.parse(value));
 			} catch (err) {
 				window.app.log(err);
 			}
@@ -53,94 +79,51 @@ export default class App extends Component {
 		});
 		window.app.on("reset", (nonce) => {
 			localStorage.clear();
-			const state = { ...this.state };
-
-			Object.keys(this.state).forEach((key) => {
-				state[key as keyof typeof state] = undefined;
-			});
-			this.setState(state);
+			setDashboard(undefined);
+			setProfile(undefined);
+			setLogin(undefined);
+			setToken(undefined);
 			window.app.send("reset", nonce);
 		});
-		if (this.state.login) {
-			await window.app.invokeClientMethod("login", false).catch(window.app.log);
-			this.setState({
-				dashboard: loadStorage<DashboardData>("dashboard"),
-			});
-		}
-	}
+		return () => {
+			window.app.removeAllListeners("write");
+			window.app.removeAllListeners("reset");
+		};
+	}, []);
+	useEffect(() => {
+		const prepare = async () => {
+			if (loginData) {
+				await window.app
+					.invokeClientMethod("login", false)
+					.catch(window.app.log);
+				setDashboard(loadStorage<DashboardData>("dashboard"));
+			}
+		};
 
-	shouldComponentUpdate(
-		_nextProps: unknown,
-		nextState: Readonly<App["state"]>
-	) {
-		return (
-			nextState.dashboard !== this.state.dashboard ||
-			nextState.login !== this.state.login ||
-			nextState.profile !== this.state.profile ||
-			nextState.token !== this.state.token
-		);
-	}
-
-	componentWillUnmount() {
-		window.app.removeAllListeners("write");
-		window.app.removeAllListeners("reset");
-	}
-
-	setState<K extends keyof this["state"]>(
-		state:
-			| Pick<this["state"], K>
-			| this["state"]
-			| ((
-					prevState: Readonly<this["state"]>,
-					props: Readonly<this["state"]>
-			  ) => Pick<this["state"], K> | this["state"] | null)
-			| null,
-		callback?: () => void
-	) {
-		super.setState(state, callback);
-	}
-
-	render() {
-		return (
-			<Provider
-				value={{
-					loginData: this.state.login,
-					profile: this.state.profile,
-					dashboard: this.state.dashboard,
-					token: this.state.token,
-					loadDashboard: () => {
-						this.setState({
-							dashboard: loadStorage<DashboardData>("dashboard"),
-						});
-					},
-					loadProfile: () => {
-						this.setState({
-							profile: loadStorage<Profilo>("profile"),
-						});
-					},
-					loadLoginData: () => {
-						this.setState({
-							login: loadStorage<LoginData>("login"),
-						});
-					},
-					loadToken: () => {
-						this.setState({
-							token: loadStorage<Token>("token"),
-						});
-					},
-				}}
-			>
-				<HashRouter>
-					<Routes>
-						<Route path="/" index Component={Splash} />
-						<Route path="/login" Component={Login} />
-						<Route path="/profiles" Component={Profiles} />
-						<Route path="/dashboard" Component={Dashboard} />
-						<Route path="/profileDetails" Component={ProfileDetails} />
-						<Route path="*" element={<Navigate replace to="/" />} />
-					</Routes>
-				</HashRouter>
-			</Provider>
-		);
-	}
-}
+		void prepare();
+	}, [loginData]);
+	return (
+		<Provider
+			value={{
+				loginData,
+				profile,
+				dashboard,
+				token,
+				loadDashboard: () => {
+					setDashboard(loadStorage<DashboardData>("dashboard"));
+				},
+				loadProfile: () => {
+					setProfile(loadStorage<Profilo>("profile"));
+				},
+				loadLogin: () => {
+					setLogin(loadStorage<LoginData>("login"));
+				},
+				loadToken: () => {
+					setToken(loadStorage<Token>("token"));
+				},
+			}}
+		>
+			<RouterProvider router={router} />
+		</Provider>
+	);
+};

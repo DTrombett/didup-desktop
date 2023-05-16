@@ -24,9 +24,8 @@ jobs:
         run: |
           npm install
 
-      - name: package
+      - name: Package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm run package
-          npm exec tsc
