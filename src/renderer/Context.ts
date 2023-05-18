@@ -13,16 +13,7 @@ const Context = createContext<{
 	profile?: Jsonify<Profilo>;
 	loginData?: Jsonify<Login>;
 	token?: Jsonify<Token>;
-	loadDashboard: () => void;
-	loadProfile: () => void;
-	loadLogin: () => void;
-	loadToken: () => void;
-}>({
-	loadDashboard: async () => {},
-	loadProfile: async () => {},
-	loadLogin: async () => {},
-	loadToken: async () => {},
-});
+}>({});
 
 export const { Provider } = Context;
 export default Context;

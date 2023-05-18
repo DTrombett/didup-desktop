@@ -118,37 +118,12 @@ export default () => {
 			window.app.removeAllListeners("reset");
 		};
 	}, []);
-	useEffect(() => {
-		const prepare = async () => {
-			if (loginData) {
-				await window.app.invokeClientMethod("login", false).catch(console.log);
-				setDashboard(loadStorage<DashboardData>("dashboard"));
-			}
-		};
-
-		void prepare();
-	}, [loginData]);
+	if (loginData)
+		useEffect(() => {
+			void window.app.invokeClientMethod("login", false).catch(console.error);
+		}, [loginData]);
 	return (
-		<Provider
-			value={{
-				loginData,
-				profile,
-				dashboard,
-				token,
-				loadDashboard: () => {
-					setDashboard(loadStorage<DashboardData>("dashboard"));
-				},
-				loadProfile: () => {
-					setProfile(loadStorage<Profilo>("profile"));
-				},
-				loadLogin: () => {
-					setLogin(loadStorage<LoginData>("login"));
-				},
-				loadToken: () => {
-					setToken(loadStorage<Token>("token"));
-				},
-			}}
-		>
+		<Provider value={{ loginData, profile, dashboard, token }}>
 			<RouterProvider router={router} />
 		</Provider>
 	);
