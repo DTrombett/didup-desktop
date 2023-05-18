@@ -1,17 +1,19 @@
 import "bulma/css/bulma.min.css";
 import type {
 	Dashboard as DashboardData,
+	Jsonify,
 	Login as LoginData,
 	Profilo,
 	Token,
 } from "portaleargo-api";
 import { useEffect, useState } from "react";
-import { Navigate, RouterProvider, createHashRouter } from "react-router-dom";
+import { RouterProvider, createHashRouter, redirect } from "react-router-dom";
 import { Provider } from "./Context";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import ProfileDetails from "./pages/ProfileDetails";
 import Profiles from "./pages/Profiles";
+import Root from "./pages/Root";
 import Splash from "./pages/Splash";
 import "./styles/index.css";
 
@@ -20,43 +22,69 @@ const loadStorage = <T,>(key: string) => {
 
 	if (item == null) return undefined;
 	try {
-		return JSON.parse(item) as T;
+		return JSON.parse(item) as Jsonify<T>;
 	} catch (err) {
 		return undefined;
 	}
 };
 
-// TODO: Try using loaders
 export default () => {
-	const [dashboard, setDashboard] = useState<DashboardData>();
+	const [dashboard, setDashboard] = useState(() =>
+		loadStorage<DashboardData>("dashboard")
+	);
 	const [profile, setProfile] = useState(() => loadStorage<Profilo>("profile"));
 	const [loginData, setLogin] = useState(() => loadStorage<LoginData>("login"));
 	const [token, setToken] = useState(() => loadStorage<Token>("token"));
 	const router = createHashRouter([
 		{
-			path: "/",
-			index: true,
-			Component: Splash,
-		},
-		{
-			path: "/login",
-			Component: Login,
-		},
-		{
-			path: "/profiles",
-			Component: Profiles,
-		},
-		{
-			path: "/dashboard",
-			Component: Dashboard,
-		},
-		{
-			path: "/profileDetails",
-			Component: ProfileDetails,
-		},
-		{
-			path: "*",
-			element: <Navigate replace to="/" />,
+			Component: Root,
+			children: [
+				{
+					index: true,
+					Component: Splash,
+					loader: () => {
+						if (dashboard) return redirect("/dashboard");
+						if (!token) return redirect("/login");
+						return null;
+					},
+				},
+				{
+					path: "login",
+					Component: Login,
+					loader: () => {
+						if (token) return redirect("/");
+						return null;
+					},
+				},
+				{
+					path: "profiles",
+					Component: Profiles,
+					loader: () => {
+						if (!(loginData && profile)) return redirect("/");
+						return null;
+					},
+				},
+				{
+					path: "dashboard",
+					Component: Dashboard,
+					loader: () => {
+						if (!dashboard) return redirect("/");
+						return null;
+					},
+				},
+				{
+					path: "profileDetails",
+					Component: ProfileDetails,
+					loader: () => {
+						if (!(loginData && profile)) return redirect("/");
+						return null;
+					},
+				},
+				{
+					path: "*",
+					loader: () => redirect("/"),
+				},
+			],
 		},
 	]);
 
@@ -73,7 +101,7 @@ export default () => {
 			try {
 				states[name as keyof typeof states](JSON.parse(value));
 			} catch (err) {
-				window.app.log(err);
+				console.log(err);
 			}
 			window.app.send("write", nonce);
 		});
@@ -93,9 +121,7 @@ export default () => {
 	useEffect(() => {
 		const prepare = async () => {
 			if (loginData) {
-				await window.app
-					.invokeClientMethod("login", false)
-					.catch(window.app.log);
+				await window.app.invokeClientMethod("login", false).catch(console.log);
 				setDashboard(loadStorage<DashboardData>("dashboard"));
 			}
 		};
