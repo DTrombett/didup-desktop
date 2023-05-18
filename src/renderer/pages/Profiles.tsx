@@ -5,8 +5,9 @@ import styles from "../styles/Profiles.module.css";
 
 export default () => {
 	const context = useContext(Context);
-	const first =
-		new URLSearchParams(window.location.search).get("first") != null;
+	// TODO: Add first login message
+	// const first =
+	// 	new URLSearchParams(window.location.search).get("first") != null;
 
 	return (
 		<div className="Profiles">
@@ -19,12 +20,12 @@ export default () => {
 					key={context.profile!.id}
 				/>
 			</div>
-			{first && (
+			{/* {first && (
 				<div className={styles.first}>
 					Accesso effettuato con successo! Ora puoi chiudere la finestra del
 					browser
 				</div>
-			)}
+			)} */}
 		</div>
 	);
 };
