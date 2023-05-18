@@ -1,5 +1,4 @@
 import { BrowserWindow, app, ipcMain, shell } from "electron";
-import install, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
 import { join, resolve } from "node:path";
 import process, {
 	argv,
@@ -135,13 +134,8 @@ const createWindow = async () => {
 		if (url.origin !== mainUrl.origin || url.pathname !== mainUrl.pathname)
 			event.preventDefault();
 	});
-	win.webContents.once("dom-ready", () => {
-		if (debug) {
-			install([REACT_DEVELOPER_TOOLS], { forceDownload: true }).catch(
-				printError
-			);
-			win?.webContents.openDevTools();
-		}
+	win.webContents.on("console-message", (_event, _level, message) => {
+		console.log(message);
 	});
 };
 const listener = (err: Error): void => {
@@ -202,9 +196,6 @@ ipcMain.handle("client", (_event, ...keys: (keyof Client)[]) =>
 ipcMain.on("login", () => {
 	urlData = generateLoginLink();
 	shell.openExternal(urlData.url).catch(printError);
-});
-ipcMain.on("log", (_event, ...args) => {
-	console.log(...args);
 });
 ipcMain.handle(
 	"invokeClientMethod",

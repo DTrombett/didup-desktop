@@ -1,15 +1,10 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
+import Error from "renderer/components/Error";
 import Loading from "renderer/components/Loading";
 import icon from "../../../assets/vario/nuovo-logo.svg";
 import styles from "../styles/Login.module.css";
-import Error from "renderer/components/Error";
-import Context from "renderer/Context";
-import { Navigate } from "react-router-dom";
 
 export default () => {
-	const context = useContext(Context);
-
-	if (context.dashboard) return <Navigate replace to="/" />;
 	const [loading, setLoading] = useState(false);
 	const error = new URLSearchParams(window.location.search).get("error") ?? "";
 

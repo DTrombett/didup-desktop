@@ -1,4 +1,4 @@
-import type { Login, Profilo } from "portaleargo-api";
+import type { Jsonify, Login, Profilo } from "portaleargo-api";
 import user from "../../../assets/avatar/pupo.svg";
 import active from "../../../assets/profile/icon-utente-in-uso.svg";
 import options from "../../../assets/profile/opzioni.svg";
@@ -10,8 +10,8 @@ export default ({
 	login,
 	state = false,
 }: {
-	profile: Profilo;
-	login: Login;
+	profile: Jsonify<Profilo>;
+	login: Jsonify<Login>;
 	state?: boolean;
 }) => (
 	<div className={styles.profile}>

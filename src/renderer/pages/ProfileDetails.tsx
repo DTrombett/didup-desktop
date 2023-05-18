@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import { Navigate } from "react-router-dom";
 import Context from "renderer/Context";
 import Profile from "renderer/components/Profile";
 import backArrow from "../../../assets/backArrow.svg";
@@ -8,8 +7,6 @@ import styles from "../styles/ProfileDetails.module.css";
 export default () => {
 	const context = useContext(Context);
 
-	if (!context.loginData || !context.profile)
-		return <Navigate replace to="/" />;
 	return (
 		<div className="ProfileDetails">
 			<div className={styles.header}>
@@ -24,9 +21,9 @@ export default () => {
 				</button>
 				<div className={styles.title}>Dettaglio profilo</div>
 				<Profile
-					login={context.loginData}
-					profile={context.profile}
-					key={context.profile.id}
+					login={context.loginData!}
+					profile={context.profile!}
+					key={context.profile!.id}
 				/>
 			</div>
 		</div>

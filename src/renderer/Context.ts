@@ -1,12 +1,18 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import type { Dashboard, Login, Profilo, Token } from "portaleargo-api";
+import type {
+	Dashboard,
+	Jsonify,
+	Login,
+	Profilo,
+	Token,
+} from "portaleargo-api";
 import { createContext } from "react";
 
 const Context = createContext<{
-	dashboard?: Dashboard;
-	profile?: Profilo;
-	loginData?: Login;
-	token?: Token;
+	dashboard?: Jsonify<Dashboard>;
+	profile?: Jsonify<Profilo>;
+	loginData?: Jsonify<Login>;
+	token?: Jsonify<Token>;
 	loadDashboard: () => void;
 	loadProfile: () => void;
 	loadLogin: () => void;

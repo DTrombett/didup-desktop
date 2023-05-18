@@ -28,9 +28,6 @@ const app = {
 	removeAllListeners<T extends keyof Args>(channel: T) {
 		ipcRenderer.removeAllListeners(channel);
 	},
-	log(this: void, ...args: unknown[]) {
-		ipcRenderer.send("log", ...args);
-	},
 	invokeClientMethod<
 		T extends Extract<
 			{
