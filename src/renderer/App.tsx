@@ -52,7 +52,7 @@ export default () => {
 					path: "login",
 					Component: Login,
 					loader: () => {
-						if (token) return redirect("/");
+						if (profile) return redirect("/profiles");
 						return null;
 					},
 				},
@@ -60,7 +60,7 @@ export default () => {
 					path: "profiles",
 					Component: Profiles,
 					loader: () => {
-						if (!(loginData && profile)) return redirect("/");
+						if (!(loginData && profile)) return redirect("/login");
 						return null;
 					},
 				},
@@ -68,7 +68,7 @@ export default () => {
 					path: "dashboard",
 					Component: Dashboard,
 					loader: () => {
-						if (!dashboard) return redirect("/");
+						if (!dashboard) return redirect("/login");
 						return null;
 					},
 				},
@@ -76,7 +76,7 @@ export default () => {
 					path: "profileDetails",
 					Component: ProfileDetails,
 					loader: () => {
-						if (!(loginData && profile)) return redirect("/");
+						if (!(loginData && profile)) return redirect("/login");
 						return null;
 					},
 				},
@@ -118,10 +118,10 @@ export default () => {
 			window.app.removeAllListeners("reset");
 		};
 	}, []);
-	if (loginData)
-		useEffect(() => {
+	useEffect(() => {
+		if (token)
 			void window.app.invokeClientMethod("login", false).catch(console.error);
-		}, [loginData]);
+	}, [token]);
 	return (
 		<Provider value={{ loginData, profile, dashboard, token }}>
 			<RouterProvider router={router} />

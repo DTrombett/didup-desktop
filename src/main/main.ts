@@ -162,31 +162,11 @@ app.on("second-instance", async (_, commandLine) => {
 	) {
 		const code = url.searchParams.get("code");
 
-		if (code != null) {
+		if (code != null)
 			await getToken(client, {
 				codeVerifier: urlData.codeVerifier,
 				code,
 			}).catch(printError);
-			const error = await client
-				.login()
-				.then(() => "")
-				.catch((err) => {
-					printError(err);
-					if (typeof err === "string") return err;
-					if (err instanceof Error) return err.message;
-					return "Errore sconosciuto";
-				});
-
-			win
-				.loadURL(
-					resolvePath(
-						error
-							? { hash: "/login", search: `error=${error}` }
-							: { hash: "/profiles", search: "first" }
-					)
-				)
-				.catch(printError);
-		}
 	}
 });
 
