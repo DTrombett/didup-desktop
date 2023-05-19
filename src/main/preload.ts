@@ -3,7 +3,7 @@ import type { Client } from "portaleargo-api";
 
 type CallbackArgs<A = [], B = A> = [A, B];
 type Args = {
-	login: CallbackArgs;
+	login: CallbackArgs<[], [error?: Error | string]>;
 	write: CallbackArgs<
 		[nonce: number],
 		[name: string, value: string, nonce: number]

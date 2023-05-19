@@ -152,8 +152,6 @@ app.once("window-all-closed", () => {
 });
 app.on("second-instance", async (_, commandLine) => {
 	if (!win) return;
-	if (win.isMinimized()) win.restore();
-	win.focus();
 	const url = new URL(commandLine.at(-1)!);
 
 	if (
@@ -162,32 +160,41 @@ app.on("second-instance", async (_, commandLine) => {
 	) {
 		const code = url.searchParams.get("code");
 
-		if (code != null)
+		if (code != null) {
+			win.webContents.send("login");
 			await getToken(client, {
 				codeVerifier: urlData.codeVerifier,
 				code,
-			}).catch(printError);
+			}).catch((err) => {
+				win?.webContents.send("login", err);
+				printError(err);
+			});
+		}
 	}
+	if (win.isMinimized()) win.restore();
+	win.focus();
 });
 
-ipcMain.handle("client", (_event, ...keys: (keyof Client)[]) =>
-	Object.fromEntries(keys.map((k) => [k, client[k]]))
-);
-ipcMain.on("login", () => {
+ipcMain.on("login", (event) => {
 	urlData = generateLoginLink();
-	shell.openExternal(urlData.url).catch(printError);
+	shell
+		.openExternal(urlData.url)
+		.then(() => {
+			event.sender.send("login");
+		})
+		.catch((err) => {
+			event.sender.send("login", err);
+			printError(err);
+		});
 });
 ipcMain.handle(
 	"invokeClientMethod",
 	<
-		T extends Extract<
-			{
-				[K in keyof Client]: Client[K] extends (...args: any[]) => any
-					? K
-					: never;
-			}[keyof Client],
-			keyof Client
-		>
+		T extends keyof {
+			[K in keyof Client as Client[K] extends (...args: any[]) => any
+				? K
+				: never]: K;
+		}
 	>(
 		_event: unknown,
 		key: T,
@@ -202,7 +209,7 @@ ipcMain.handle(
 	}
 );
 
-if (env.NODE_ENV === "production")
+if (app.isPackaged)
 	(
 		require("source-map-support") as {
 			install(): void;

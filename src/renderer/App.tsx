@@ -6,9 +6,8 @@ import type {
 	Profilo,
 	Token,
 } from "portaleargo-api";
-import { useEffect, useState } from "react";
+import { StrictMode, useEffect, useState } from "react";
 import { RouterProvider, createHashRouter, redirect } from "react-router-dom";
-import { Provider } from "./Context";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import ProfileDetails from "./pages/ProfileDetails";
@@ -58,7 +57,7 @@ export default () => {
 				},
 				{
 					path: "profiles",
-					Component: Profiles,
+					element: <Profiles profile={profile!} loginData={loginData!} />,
 					loader: () => {
 						if (!(loginData && profile)) return redirect("/login");
 						return null;
@@ -66,7 +65,7 @@ export default () => {
 				},
 				{
 					path: "dashboard",
-					Component: Dashboard,
+					element: <Dashboard dashboard={dashboard!} />,
 					loader: () => {
 						if (!dashboard) return redirect("/login");
 						return null;
@@ -74,7 +73,7 @@ export default () => {
 				},
 				{
 					path: "profileDetails",
-					Component: ProfileDetails,
+					element: <ProfileDetails profile={profile!} loginData={loginData!} />,
 					loader: () => {
 						if (!(loginData && profile)) return redirect("/login");
 						return null;
@@ -120,11 +119,11 @@ export default () => {
 	}, []);
 	useEffect(() => {
 		if (token)
-			void window.app.invokeClientMethod("login", false).catch(console.error);
+			window.app.invokeClientMethod("login", false).catch(console.error);
 	}, [token]);
 	return (
-		<Provider value={{ loginData, profile, dashboard, token }}>
+		<StrictMode>
 			<RouterProvider router={router} />
-		</Provider>
+		</StrictMode>
 	);
 };

@@ -7,11 +7,11 @@ import { Link } from "react-router-dom";
 
 export default ({
 	profile,
-	login,
+	loginData: login,
 	state = false,
 }: {
 	profile: Jsonify<Profilo>;
-	login: Jsonify<Login>;
+	loginData: Jsonify<Login>;
 	state?: boolean;
 }) => (
 	<div className={styles.profile}>
