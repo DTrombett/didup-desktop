@@ -100,6 +100,7 @@ module.exports = {
 		"no-new-func": "warn",
 		"no-new-wrappers": "warn",
 		"no-octal-escape": "warn",
+		"no-plusplus": "off",
 		"no-process-exit": "off",
 		"no-promise-executor-return": "warn",
 		"no-param-reassign": "off",
