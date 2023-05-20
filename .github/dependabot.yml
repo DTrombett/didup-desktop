@@ -11,3 +11,4 @@ updates:
       include: "scope"
     reviewers:
       - "DTrombett"
+    open-pull-requests-limit: 10
