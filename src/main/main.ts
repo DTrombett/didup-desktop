@@ -94,7 +94,7 @@ const client = new Client({
 const createWindow = async () => {
 	win = new BrowserWindow({
 		autoHideMenuBar: true,
-		backgroundColor: "#202020",
+		backgroundColor: "#282828",
 		icon: join(
 			app.isPackaged
 				? join(resourcesPath, "assets")
@@ -103,7 +103,7 @@ const createWindow = async () => {
 		),
 		minHeight: 500,
 		minWidth: 500,
-		opacity: 0.99,
+		opacity: app.isPackaged ? 0.999 : 0.99,
 		show: false,
 		webPreferences: {
 			preload: app.isPackaged
@@ -128,7 +128,7 @@ const createWindow = async () => {
 		return { action: "deny" };
 	});
 	win.webContents.on("will-navigate", (event, input) => {
-		if (event.type === "hashchange") return;
+		if (event.isSameDocument) return;
 		const url = new URL(input);
 
 		if (url.origin !== mainUrl.origin || url.pathname !== mainUrl.pathname)

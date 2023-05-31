@@ -72,9 +72,9 @@
 }
 
 #root {
-	--background-color: #202020;
+	--background-color: transparent;
 	--text-color: #ffffff;
-	--embed-color: #272727;
+	--embed-color: #202020;
 	--link-color: #afd5da;
 	--red-color: #ff3442;
 	position: relative;
@@ -103,6 +103,20 @@
 }
 ::-webkit-scrollbar-thumb:active {
 	background-color: #bfbfbf;
+}
+
+* {
+	border-radius: 5px;
+}
+
+a,
+img {
+	-webkit-user-drag: none;
+}
+
+.focus:focus-visible {
+	outline: 3px solid #6ea9aa;
+	outline-offset: -1px;
 }
 
 .title {

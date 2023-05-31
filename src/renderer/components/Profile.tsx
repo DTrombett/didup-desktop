@@ -5,6 +5,7 @@ import options from "../../../assets/profile/opzioni.svg";
 import styles from "../styles/Profile.module.css";
 import { Link } from "react-router-dom";
 
+// TODO: Change all the svg colors to currentColor and add options effect on hover
 export default ({
 	profile,
 	loginData: login,
@@ -33,7 +34,7 @@ export default ({
 				</div>
 			</div>
 			{state && (
-				<Link className={`${styles.options} button`} to="/profileDetails">
+				<Link className={`${styles.options} focus`} to="/profileDetails">
 					<img src={options} alt="options" className={styles.optionsImage} />
 				</Link>
 			)}
@@ -47,7 +48,7 @@ export default ({
 					<img src={active} alt="active" className={styles.stateImage} />
 					<div>In uso</div>
 				</div>
-				<Link className={`${styles.join} button`} to="/dashboard">
+				<Link className={`${styles.join} focus`} to="/dashboard">
 					Entra nel profilo
 				</Link>
 			</div>
