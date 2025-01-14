@@ -95,7 +95,7 @@
 		"prettier": "^3.4.2",
 		"react-refresh": "^0.16.0",
 		"react-test-renderer": "^19.0.0",
-		"sass": "^1.83.1",
+		"sass": "^1.83.4",
 		"sass-loader": "^16.0.4",
 		"style-loader": "^4.0.0",
 		"terser-webpack-plugin": "^5.3.11",
